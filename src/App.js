@@ -20,22 +20,26 @@ function App() {
   return ( 
   <BrowserRouter>
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header"> */}
         {/* <CustSignUp/> */}
+       
         <Navbar/>
-        <Routes>
-            <Route exact path="/" component={Home}/>
-            <Route exact path="/about" component={AboutUs}/>
-            <Route exact path="/contact" component={ContactUs}/>
-            <Route exact path="/attractions" component={Attractions}/>
-            <Route exact path="/stores" component={Stores}/>
-            <Route exact path="/shows" component={Shows}/>
-            <Route exact path="/book" component={BookTickets}/>
-            <Route exact path="/orders" component={MyOrders}/>
-            <Route exact path="/profile" component={Profile}/>
-            <Route exact path="/admin" component={AdminProfile}/>
-        </Routes>
-      </header>
+        <div> 
+          <Routes>
+              <Route exact path="/" element={<Home/>}/>
+                    
+              <Route exact path="/about"  element={<AboutUs/>} />
+              <Route exact path="/contact"  element={<ContactUs/>} /> 
+              <Route exact path="/attractions" element={<Attractions/>}/>
+              <Route exact path="/stores" element={<Stores/>} />
+              <Route exact path="/shows" element={<Shows/>} />
+              <Route exact path="/book" element={<BookTickets/>} />
+              <Route exact path="/orders" element={<MyOrders/>} />
+              <Route exact path="/profile" element={<Profile/>} />
+              <Route exact path="/admin" element={<AdminProfile/>} />
+          </Routes>
+        </div>
+      {/* </header> */}
     </div>
     </BrowserRouter>
   );
