@@ -2,7 +2,7 @@ import React  from 'react';
 import { Link } from 'react-router-dom'; 
 import { DatePicker } from 'antd';
 import { Radio } from 'antd';
-import { Button, message, Steps, theme, Result } from 'antd';
+import { Button, Steps, Result } from 'antd';
 import { Input } from 'antd'; 
 import { DeleteOutlined } from '@ant-design/icons'; 
 import { Alert } from 'antd';
@@ -104,12 +104,12 @@ export class BookDisplay extends React.Component {
                 alertMessage: "You should select a visit date from now on.", 
                 showAlert: true
             }) 
-        } else if (val1 == 0 && val2 == 0) { 
+        } else if (val1 === 0 && val2 === 0) { 
             this.setState ({
                 alertMessage: "You should select at least one ticket.", 
                 showAlert: true
             })
-        } else if (val1 != val2) {
+        } else if (val1 !== val2) {
             //not match
             this.setState ({
                 alertMessage: "You should add equivalent amount of accounts.", 
@@ -183,7 +183,7 @@ export class BookDisplay extends React.Component {
             <div className='subbody'> 
                 <Steps current={this.state.stepIndex} items={items} 
                     style = {{marginTop: 20}}/>
-                {this.state.stepIndex == 0 && (
+                {this.state.stepIndex === 0 && (
                 <div className='bookBox'>
                     <label style = {{color: '#0367D9', fontSize: 24, fontStyle: 'bold', marginTop: 20}}>
                         Welcome to Wonderful Land!
@@ -245,7 +245,7 @@ export class BookDisplay extends React.Component {
                     
                 </div>)}
 
-                {this.state.stepIndex == 1 && (
+                {this.state.stepIndex === 1 && (
                     <div className='bookBox'> 
                         <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                             <label style = {{marginTop: 20, fontSize: 20, fontStyle: 'bold'}}>Book Summary</label> 
@@ -298,13 +298,13 @@ export class BookDisplay extends React.Component {
                         }
                     </div>)}
                 
-                {this.state.stepIndex == 2 && (
+                {this.state.stepIndex === 2 && (
                     <div className='bookBox'>
                         <Result
                             status="success"
                             title="Successfully Purchased Ticket(s)!"
                             extra={[
-                                <Link to = '/Home'>
+                                <Link to = '/'>
                                     <Button>
                                         Go to Home
                                     </Button>

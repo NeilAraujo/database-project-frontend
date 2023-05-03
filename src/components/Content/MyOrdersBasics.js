@@ -127,19 +127,19 @@ function Order({stateData}) {
 function ViewDetail({index}) { 
     console.log("index: " + index)
     if (index === 1) {
-        return (<Link to = '/BookTickets'>
+        return (<Link to = '/book'>
             <Button>Buy Again</Button>
         </Link>)
     } else if (index === 2) {
-        return (<Link to = '/Stores'>
+        return (<Link to = '/stores'>
             <Button>View More Details</Button>
         </Link>)
     } else if (index === 3) {
-        return (<Link to = '/Shows'>
+        return (<Link to = '/shows'>
             <Button>View More Details</Button>
         </Link>)
     } else {
-        return (<Link to = '/Attractions'>
+        return (<Link to = '/attractions'>
         <Button>View More Details</Button>
     </Link>)
     }
