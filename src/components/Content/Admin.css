@@ -1,0 +1,14 @@
+.tabGroupBox {
+    width: 90%; 
+    margin-top: 50px;
+    margin-left: 5%;
+    margin-right: 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+}
+
+.tabContentBox {
+    width: 95%; 
+    padding-top: 20px; 
+}
