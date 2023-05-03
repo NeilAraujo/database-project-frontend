@@ -1,0 +1,36 @@
+.tabGroupBox {
+    width: 100%; 
+    padding: 20px; 
+    margin-top: 50px;
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+}
+
+.tabContentBox {
+    width: 90%; 
+    padding: 20px; 
+}
+
+.attractionImage {
+    width: 30%;
+    height: 30%; 
+}
+
+.attractionDisplay {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    margin-left: 70px;
+    width: 80%;
+}
+
+.attractionDistance {
+    margin-bottom: 8px;
+}
+
+.mapImage {
+    max-width: 80%;
+    max-height: 80%;
+}
