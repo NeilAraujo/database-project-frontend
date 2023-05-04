@@ -4,7 +4,6 @@ import { StoreDisplay } from '../Content/StoresBasics';
 const Stores = () => {
     return (
         <div>
-            Stores
             <StoreDisplay />
         </div>
     );

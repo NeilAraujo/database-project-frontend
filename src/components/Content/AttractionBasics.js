@@ -81,7 +81,7 @@ function TabGroup({typeData, attraction, location}) {
               key={index}
               active={activeType === type.atttype_id}
               onClick={() => setActiveType(type.atttype_id)} 
-              style = {{fontSize: 22, fontStyle: 'bold', color: '#1C468E'}}
+              style = {{fontSize: 22, fontStyle: 'bold', color: '#253A56'}}
             >
               {type.atttype_name}
             </Tab>

@@ -1,4 +1,11 @@
-.itemImage {
+.itemImage1 {
     width: 80%;
+    border-style: none;
+    border-radius: 10%;
+}
+
+.itemImage2 {
+    width: 25%;
+    border-style: none;
     border-radius: 10%;
 }

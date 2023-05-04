@@ -6,9 +6,6 @@ import './Shows.css';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
-const url = "/Users/qianzhang/database-project-frontend/src/images"; 
-const images = [{id: 1, type: 'Drama'}, {id: 2, type: 'Musical'}, {id: 3, type: 'Comedy'}, {id: 4, type: 'Horror'}, {id: 5, type: 'Adventure'}]; 
-
 //not changed by database
 export function ShowDisplay() { 
     const [typeData, setTypeData] = useState([]); 
