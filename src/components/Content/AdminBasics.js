@@ -1,11 +1,9 @@
 import React  from 'react';
-import {useState} from 'react'; 
+import { useState, useEffect } from 'react'; 
 import { Tag, Table } from 'antd'; 
 
 import styled from 'styled-components'; 
 import './Admin.css'; 
-
-const { Column, ColumnGroup } = Table; 
 
 const Tab = styled.button`
   font-size: 16px;
@@ -157,18 +155,17 @@ function ShowAllVisitors({dataSource}) {
             dataIndex: 'type', 
             key: 'type', 
             render: (_, {type}) => {
-                console.log("type: " + type);
-                if (type == 'M') {
+                if (type === 'M') {
                     return (
                     <Tag color = 'volcano'>
                         {'Member'}
                     </Tag>)
-                } else if (type == 'S') {
+                } else if (type === 'S') {
                     return (
                     <Tag color = 'purple'>
                         {'Student'}
                     </Tag>)
-                } else if (type == 'G') {
+                } else if (type === 'G') {
                     return (
                     <Tag color = 'geekblue'>
                         {'Group'}
@@ -187,171 +184,180 @@ function ShowAllVisitors({dataSource}) {
     return (<Table columns={columns} dataSource={data} />);
 }
 
-class AllTickets extends React.Component{
-    state = [
-        {
-            id: 1, 
-            online: '1',
-            visitDate: '2023-04-10', 
-            price: '100', 
-            discount: '35', 
-            isPaid: '1', 
-            typeID: 1, 
-        }, {
-            id: 2, 
-            online: '1',
-            visitDate: '2023-04-10', 
-            price: '100', 
-            discount: '35', 
-            isPaid: '1', 
-            typeID: 1, 
-        }, {
-            id: 3, 
-            online: '1',
-            visitDate: '2023-04-10', 
-            price: '100', 
-            discount: '35', 
-            isPaid: '1', 
-            typeID: 1, 
-        }, {
-            id: 4, 
-            online: '1',
-            visitDate: '2023-04-10', 
-            price: '100', 
-            discount: '35', 
-            isPaid: '1', 
-            typeID: 1, 
-        }] 
-    
-        render() {
-            return (<ShowAllTickets dataSource = {this.state} />)
-        }
+function AllTickets() { 
+    const [typeData, setTypeData] = useState([]);
+    const [ticketData, setTicketData] = useState([]); 
+
+    useEffect(() => {
+        fetch('http://localhost:8080/ticket/listtkttype') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setTypeData(data.data); 
+        })
+    });
+
+    useEffect(() => {
+        fetch('http://localhost:8080/ticket/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setTicketData(data.data); 
+        })
+    }); 
+
+        
+    return (<ShowAllTickets typeData={typeData} ticketData={ticketData}/>)
 }
 
-function ShowAllTickets ({dataSource}) {
+function ShowAllTickets ({typeData, ticketData}) { 
+    function getType(tkttype_id) {
+        for (let i = 0; i < typeData.length; i++) {
+            if (typeData[i].tkttype_id === tkttype_id) {
+                return typeData[i].tkttype_name; 
+            }
+        }
+        return ''; 
+    }
+
     const columns = [
         {
             title: 'ID', 
-            dataIndex: 'id', 
-            key: 'id', 
+            dataIndex: 'tkt_id', 
+            key: 'tkt_id', 
+        }, {
+            title: 'Type', 
+            dataIndex: 'tkttype_id', 
+            key: 'tkttype_id', 
+            render: (_, {tkttype_id}) => {
+                return <label>{getType(tkttype_id)}</label>
+            }
         }, {
             title: 'Method', 
-            dataIndex: 'online', 
-            key: 'online', 
-            render: (_, {online}) => {
-                if (online === '1') {
+            dataIndex: 'tkt_online', 
+            key: 'tkt_online', 
+            render: (_, {tkt_online}) => {
+                if (tkt_online === '1.0') {
                     return <label>online</label>
                 } else {
                     return <label>onsite</label>
                 }
             }
         }, {
-            title: 'Type', 
-            dataIndex: 'typeID', 
-            key: 'typeID', 
-        }, {
             title: 'Visit Date', 
-            dataIndex: 'visitDate', 
-            key: 'visitDate'
+            dataIndex: 'tkt_visit_date', 
+            key: 'tkt_visit_date', 
+            render: (_, {tkt_visit_date}) => {
+                return <label>{tkt_visit_date.substring(0, 10)}</label>
+            }
         }, {
             title: 'Price', 
-            dataIndex: 'price', 
-            key: 'price', 
-            render: (_, {price}) => {
-                return <label>${price}</label>
+            dataIndex: 'tkt_price', 
+            key: 'tkt_price', 
+            render: (_, {tkt_price}) => {
+                return <label>${tkt_price}</label>
             }
         }, {
             title: 'Discount', 
-            dataIndex: 'discount', 
-            key: 'discount', 
-            render: (_, {discount}) => {
-                return <label>{discount}%</label>
+            dataIndex: 'tkt_discount', 
+            key: 'tkt_discount', 
+            render: (_, {tkt_discount}) => {
+                return <label>{tkt_discount}%</label>
             }
         }, 
     ];
-    const data = dataSource;
     
-    return (<Table columns={columns} dataSource={data} />);
+    return (<Table columns={columns} dataSource={ticketData} />);
 }
 
-class AllShows extends React.Component{
-    state = [
-        {
-            id: 1, 
-            name: 'Frozen',
-            description: 'Fearless Anna starts her journey to find her sister Elsa',
-            startTime: '10:30:00', 
-            endTime: '11:15:00',
-            wheelchairAcc: '1', 
-            price: 20, 
-            typeID: 1, 
-        }, {
-            id: 2, 
-            name: 'Frozen',
-            description: 'Fearless Anna starts her journey to find her sister Elsa',
-            startTime: '10:30:00', 
-            endTime: '11:15:00',
-            wheelchairAcc: '1', 
-            price: 20, 
-            typeID: 1, 
-        }, {
-            id: 2, 
-            name: 'Frozen',
-            description: 'Fearless Anna starts her journey to find her sister Elsa',
-            startTime: '10:30:00', 
-            endTime: '11:15:00',
-            wheelchairAcc: '1', 
-            price: 20, 
-            typeID: 1, 
-        }, {
-            id: 3, 
-            name: 'Frozen',
-            description: 'Fearless Anna starts her journey to find her sister Elsa',
-            startTime: '10:30:00', 
-            endTime: '11:15:00',
-            wheelchairAcc: '1', 
-            price: 20, 
-            typeID: 1, 
-        }] 
+function AllShows() { 
+    const [typeData, setTypeData] = useState([]); 
+    const [showData, setShowData] = useState([]); 
     
-        render() {
-            return (<ShowAllShows dataSource = {this.state} />)
+    useEffect(() => {
+        fetch('http://localhost:8080/show/listshtype') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setTypeData(data.data); 
+        })
+    });
+
+    useEffect(() => {
+        fetch('http://localhost:8080/show/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setShowData(data.data); 
+        })
+    });
+        
+    return (<ShowAllShows typeData={typeData} showData={showData}/>)
+        
+}
+
+function ShowAllShows ({ typeData, showData }) {
+    function getType(shtype_id) { 
+        for (let i = 0; i < typeData.length; i++) {
+            if (typeData[i].shtype_id === shtype_id) {
+                return typeData[i].shtype_name; 
+            }
         }
-}
+        return ''; 
+    }
 
-function ShowAllShows ({ dataSource }) {
-    const data = dataSource;
-    
-    return (
-    <Table dataSource={data} >
-        <Column title = 'ID' dataIndex = 'id' key = 'id'/>
-        <Column title = 'Name' dataIndex = 'name' key = 'name' />
-        <Column title = 'Description' dataIndex = 'description' key = 'description'/>
-        <ColumnGroup title = "Show Time">
-            <Column title = 'Start' dataIndex = 'startTime' key = 'startTime'/>
-            <Column title = 'End' dataIndex = 'endTime' key = 'endTime'/>
-        </ColumnGroup> 
-        <Column 
-            title = 'Wheelchair Accessible'  
-            dataIndex = 'wheelchairAcc'
-            key = 'wheelchairAcc'
-            render = {(wheelchairAcc) => {
-                if (wheelchairAcc === '1') {
+    const columns = [
+        {
+            title: 'ID', 
+            dataIndex: 'sh_id', 
+            key: 'sh_id', 
+        }, {
+            title: 'Name', 
+            dataIndex: 'sh_name', 
+            key: 'sh_name', 
+        }, {
+            title: 'Type', 
+            dataIndex: 'shtype_id', 
+            key: 'shtype_id', 
+            render: (_, {shtype_id}) => {
+                return <label>{getType(shtype_id)}</label>
+            }
+        }, {
+            title: 'Description', 
+            dataIndex: 'sh_description', 
+            key: 'sh_description', 
+        }, {
+            title: 'Start Time', 
+            dataIndex: 'sh_start_time', 
+            key: 'sh_start_time', 
+            render: (_, {sh_start_time}) => {
+                return <label>{sh_start_time.substring(11, 19)}</label>
+            }
+        }, {
+            title: 'End Time', 
+            dataIndex: 'sh_end_time', 
+            key: 'sh_end_time', 
+            render: (_, {sh_end_time}) => {
+                return <label>{sh_end_time.substring(11, 19)}</label>
+            }
+        }, {
+            title: 'Wheelchair Accessible', 
+            dataIndex: 'sh_wheelchair_acc', 
+            key: 'sh_wheelchair_acc', 
+            render: (_, {sh_wheelchair_acc}) => { 
+                if (sh_wheelchair_acc === '1.0') {
                     return <label>Allowed</label>
                 } else {
                     return <label>Not Allowed</label>
                 }
-            }} />
-        <Column 
-            title = 'Price' 
-            dataIndex = 'price' 
-            key = 'price'
-            render = {(price) => {
-                return <label>${price}</label>
-            }} />
-        <Column title = 'Type' dataIndex = 'typeID' key = 'typeID'/>
-    </Table>
-    );
+            }
+        }, {
+            title: 'Price', 
+            dataIndex: 'sh_price', 
+            key: 'sh_price', 
+            render: (_, {sh_price}) => {
+                return <label>$ {sh_price}</label>
+            }
+        }, 
+    ];
+    
+    return (<Table columns={columns} dataSource={showData} />);
 }
 
 class AllStores extends React.Component {
@@ -362,107 +368,114 @@ class AllStores extends React.Component {
     }
 }  
 
-class AllAttractions extends React.Component{
-    state = [
-        {
-            id: 1, 
-            name: 'Avatar Flight',
-            description: 'Climb atop a winged mountain banshee for a flight over Pandora landscape',
-            status: 'open', 
-            capacity: 20,
-            minimumHeight: 112, 
-            durationTime: 20, 
-            typeID: 1, 
-            locaID: 1, 
-        }, {
-            id: 2, 
-            name: 'Avatar Flight',
-            description: 'Climb atop a winged mountain banshee for a flight over Pandora landscape',
-            status: 'open', 
-            capacity: 20,
-            minimumHeight: 112, 
-            durationTime: 20, 
-            typeID: 1, 
-            locaID: 1, 
-        }, {
-            id: 3, 
-            name: 'Avatar Flight',
-            description: 'Climb atop a winged mountain banshee for a flight over Pandora landscape',
-            status: 'open', 
-            capacity: 20,
-            minimumHeight: 112, 
-            durationTime: 20, 
-            typeID: 1, 
-            locaID: 1, 
-        }, {
-            id: 4, 
-            name: 'Avatar Flight',
-            description: 'Climb atop a winged mountain banshee for a flight over Pandora landscape',
-            status: 'open', 
-            capacity: 20,
-            minimumHeight: 112, 
-            durationTime: 20, 
-            typeID: 1, 
-            locaID: 1, 
-        }] 
-    
-        render() {
-            return (<ShowAllAttractions dataSource = {this.state} />)
-        }
+function AllAttractions() { 
+    const [typeData, setTypeData] = useState([]); 
+    const [location, setLocation] = useState([]);
+    const [attraction, setAttraction] = useState([]); 
+
+    useEffect(() => {
+        fetch('http://localhost:8080/attraction/listatttype') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setTypeData(data.data); 
+        })
+    });
+
+    useEffect(() => {
+        fetch('http://localhost:8080/attraction/listls') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setLocation(data.data); 
+        })
+    });
+
+    useEffect(() => {
+        fetch('http://localhost:8080/attraction/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setAttraction(data.data); 
+        })
+    });
+        
+    return (<ShowAllAttractions typeData={typeData} location={location} attraction={attraction}/>)
+        
 } 
 
-function ShowAllAttractions({dataSource}) {
+function ShowAllAttractions({typeData, location, attraction}) { 
+    function getType(atttype_id) { 
+        for (let i = 0; i < typeData.length; i++) {
+            if (typeData[i].atttype_id === atttype_id) {
+                return typeData[i].atttype_name; 
+            }
+        }
+        return ''; 
+    }
+
+    function getLocation(ls_id) { 
+        for (let i = 0; i < location.length; i++) {
+            if (location[i].ls_id === ls_id) {
+                return location[i].ls_name; 
+            }
+        }
+        return ''; 
+    }
+
     const columns = [
         {
             title: 'ID', 
-            dataIndex: 'id', 
-            key: 'id', 
+            dataIndex: 'att_id', 
+            key: 'att_id', 
         }, {
             title: 'Name', 
-            dataIndex: 'name', 
-            key: 'name',
+            dataIndex: 'att_name', 
+            key: 'att_name', 
+        }, {
+            title: 'Type', 
+            dataIndex: 'atttype_id', 
+            key: 'atttype_id', 
+            render: (_, {atttype_id}) => {
+                return <label>{getType(atttype_id)}</label>
+            }
         }, {
             title: 'Description', 
-            dataIndex: 'description', 
-            key: 'description', 
+            dataIndex: 'att_description', 
+            key: 'att_description', 
         }, {
             title: 'Status', 
-            dataIndex: 'status', 
-            key: 'status', 
+            dataIndex: 'att_status', 
+            key: 'att_status', 
         }, {
             title: 'Capacity', 
-            dataIndex: 'capacity', 
-            key: 'capacity', 
-            render: (_, {capacity}) => {
-                return <label>{capacity}people</label>
+            dataIndex: 'att_capacity', 
+            key: 'att_capacity', 
+            render: (_, {att_capacity}) => {
+                return <label>{att_capacity} people</label>
             }
         }, {
             title: 'Minimum Height', 
-            dataIndex: 'minimumHeight', 
-            key: 'minimumHeight', 
-            render: (_, {minimumHeight}) => {
-                return <label>{minimumHeight}cm</label>
+            dataIndex: 'att_minimum_height', 
+            key: 'att_minimum_height', 
+            render: (_, {att_minimum_height}) => {
+                return <label>{att_minimum_height} cm</label>
             }
         }, {
             title: 'Duration Time', 
-            dataIndex: 'durationTime', 
-            key: 'durationTime', 
-            render: (_, {durationTime}) => {
-                return <label>{durationTime}mins</label>
+            dataIndex: 'att_duration_time', 
+            key: 'att_duration_time', 
+            render: (_, {att_duration_time}) => {
+                return <label>{att_duration_time} mins</label>
             }
         }, {
-            title: 'Type', 
-            dataIndex: 'typeID', 
-            key: 'typeID', 
-        }, {
-            title: 'Location', 
-            dataIndex: 'locaID', 
-            key: 'locaID'
+            title: 'Location Section', 
+            dataIndex: 'ls_id', 
+            key: 'ls_id', 
+            render: (_, {ls_id}) => {
+                return <label>{getLocation(ls_id)}</label>
+            }
         }, 
     ];
-    const data = dataSource;
     
-    return (<Table columns={columns} dataSource={data} />);
+    return (<Table columns={columns} dataSource={attraction} />);
 }
 
 class AllOrders extends React.Component{

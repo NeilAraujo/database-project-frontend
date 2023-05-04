@@ -9,7 +9,6 @@ import './Stores.css';
 export function StoreDisplay() { 
     const [category, setCategory] = useState([]); 
     const [storeData, setStoreData] = useState([]); 
-    const [menuItems, setMenuItems] = useState([{}]); 
     
     useEffect(() => {
         fetch('http://localhost:8080/store/listctg') 
@@ -63,7 +62,7 @@ function StoreBar({ctg_id, storeData}) {
     <div> 
         {
             storeData.map((store, index) => { 
-                if (store.ctg_id == ctg_id) { 
+                if (store.ctg_id === ctg_id) { 
                     //get menu items in this store 
                     return (
                         <div>
@@ -109,7 +108,7 @@ function GetMenu({st_id}) {
             {
                 menuItems.map((item, index) => {
                     return(
-                        <div key = {index}>
+                        <div key = {index} style = {{border: 0}}>
                             <img src={require(`./images/menuitem/${item.mi_name}.jpg`)} alt={item.mi_name} className = 'itemImage1'/>
                             <label>{item.mi_name} ${item.mi_unit_price}</label>
                         </div>)
