@@ -103,7 +103,7 @@ function ShowBar({showType, showData}) {
                             <br />
                             <label>Price: ${show.sh_price}</label>
                             <br />
-                            <lable>Wheelchair Accessible: {show.sh_wheelchair_acc ? 'Yes' : 'No'}</lable>
+                            <lable>Wheelchair Accessible: {show.sh_wheelchair_acc == 1 ? 'Yes' : 'No'}</lable>
                         </div>
                     ))
                 }

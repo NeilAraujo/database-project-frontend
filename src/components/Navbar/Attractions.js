@@ -4,7 +4,6 @@ import { AttractionDisplay } from '../Content/AttractionBasics';
 const Attractions = () => {
     return (
         <div>
-            Atractions
             <AttractionDisplay />
         </div>
     );

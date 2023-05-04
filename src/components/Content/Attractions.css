@@ -16,6 +16,7 @@
 .attractionImage {
     width: 30%;
     height: 30%; 
+    margin-top: 10px;
 }
 
 .attractionDisplay {
