@@ -44,7 +44,7 @@ export class AllData {
 
 function TapGroup() {
     const [activeTab, setActiveTab] = useState('All Visitors'); 
-    const titles = ['All Visitors', 'All Orders', 'All Tickets', 'All Shows', 'All Attractions', 'All Stores']; 
+    const titles = ['All Visitors', 'All Orders', 'All Tickets', 'All Shows', 'All Attractions', 'All Stores', 'All Parkings']; 
     return (
         <div className='tabGroupBox'>
           <ButtonGroup>
@@ -76,6 +76,9 @@ function TapGroup() {
             )}
             {activeTab === 'All Stores' && (
                 <AllStores />
+            )}
+            {activeTab === 'All Parkings' && (
+                <AllParkings />
             )}
           </div>
         </div>
@@ -360,14 +363,6 @@ function ShowAllShows ({ typeData, showData }) {
     return (<Table columns={columns} dataSource={showData} />);
 }
 
-class AllStores extends React.Component {
-    render() {
-        return (
-            <div>Stores</div>
-        )
-    }
-}  
-
 function AllAttractions() { 
     const [typeData, setTypeData] = useState([]); 
     const [location, setLocation] = useState([]);
@@ -477,6 +472,166 @@ function ShowAllAttractions({typeData, location, attraction}) {
     
     return (<Table columns={columns} dataSource={attraction} />);
 }
+
+function AllStores() {
+    const [category, setCategory] = useState([]); 
+    const [storeData, setStoreData] = useState([]); 
+
+    useEffect(() => {
+        fetch('http://localhost:8080/store/listctg') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setCategory(data.data); 
+        })
+    });
+
+    useEffect(() => {
+        fetch('http://localhost:8080/store/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setStoreData(data.data); 
+        })
+    });
+
+    return (<ShowAllStores category={category} storeData={storeData}/>)
+}  
+
+function ShowAllStores({category, storeData}) { 
+    function getCategory(ctg_id) {
+        for (let i = 0; i < category.length; i++) {
+            if (category[i].ctg_id === ctg_id) {
+                return category[i].ctg_name; 
+            }
+        }
+        return ''; 
+    }
+
+    const columns = [
+        {
+            title: 'ID', 
+            dataIndex: 'st_id', 
+            key: 'st_id', 
+        }, {
+            title: 'Name', 
+            dataIndex: 'st_name', 
+            key: 'st_name', 
+        }, {
+            title: 'Category', 
+            dataIndex: 'ctg_id', 
+            key: 'ctg_id', 
+            render: (_, {ctg_id}) => {
+                return <label>{getCategory(ctg_id)}</label>
+            }
+        }, {
+            title: 'Description', 
+            dataIndex: 'st_description', 
+            key: 'st_description', 
+        }, {
+            title: 'Menu Items', 
+            dataIndex: 'st_id', 
+            key: 'st_id', 
+            render: (_, {st_id}) => {
+                return <GetMenu st_id={st_id} />
+            }
+        },  
+    ];
+
+    return (<Table columns={columns} dataSource={storeData} />);
+} 
+
+function GetMenu({st_id}) {
+    const [menuItems, setMenuItems] = useState([]); 
+    useEffect(() => {
+        fetch(`http://localhost:8080/store/getmi?stId=${st_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => { 
+            setMenuItems(data.data); 
+            console.log("menu items: " + menuItems); 
+        })
+    }); 
+
+    return (
+        <ul>
+            {
+                menuItems.map((item, index) => (
+                    <li>{item.mi_name}: $ {item.mi_unit_price}</li>
+                ))
+            }
+        </ul>
+    );
+}
+
+function AllParkings() {
+    const [parkLot, setParkLot] = useState([]); 
+    const [parking, setParking] = useState([]); 
+
+    useEffect(() => {
+        fetch('http://localhost:8080/parking/listpl') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setParkLot(data.data); 
+        })
+    });
+
+    useEffect(() => {
+        fetch('http://localhost:8080/parking/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setParking(data.data); 
+        })
+    });
+
+    return (<ShowAllParkings parkLot = {parkLot} parking = {parking} />)
+    
+}  
+
+function ShowAllParkings({parkLot, parking}) {
+     function getParkLot(pl_id) {
+        for (let i = 0; i < parkLot.length; i++) {
+            if (parkLot[i].pl_id === pl_id) {
+                return parkLot[i].pl_name; 
+            }
+        }
+        return ''; 
+    }
+
+    const columns = [
+        {
+            title: 'ID', 
+            dataIndex: 'park_id', 
+            key: 'park_id', 
+        }, {
+            title: 'Time in', 
+            dataIndex: 'park_time_in', 
+            key: 'park_time_in', 
+        }, {
+            title: 'Time out', 
+            dataIndex: 'park_time_out', 
+            key: 'park_time_out', 
+        }, {
+            title: 'Fee per Hour', 
+            dataIndex: 'park_fee', 
+            key: 'park_fee', 
+            render: (_, {park_fee}) => {
+                return <label>$ {park_fee}</label>
+            }
+        }, {
+            title: 'Spot Number', 
+            dataIndex: 'park_spotno', 
+            key: 'park_spotno', 
+        }, {
+            title: 'Parking Lot', 
+            dataIndex: 'pl_id', 
+            key: 'pl_id', 
+            render: (_, {pl_id}) => {
+                return <label>{getParkLot(pl_id)}</label>
+            }
+        },   
+    ];
+
+    return (<Table columns={columns} dataSource={parking} />);
+}
+
 
 class AllOrders extends React.Component{
     state = [{
