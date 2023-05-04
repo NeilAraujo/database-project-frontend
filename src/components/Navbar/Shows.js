@@ -4,7 +4,6 @@ import { ShowDisplay } from '../Content/ShowsBasics';
 const Shows = () => {
     return (
         <div>
-            Shows
             <ShowDisplay />
         </div>
     );

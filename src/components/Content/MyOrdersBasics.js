@@ -1,11 +1,11 @@
 import React from 'react'; 
 import { Link } from 'react-router-dom'; 
-import { useState} from 'react'; 
+import { useState, useEffect } from 'react'; 
 import { Button } from 'antd';
 import './MyOrders.css';
 
-export class OrderDisplay extends React.Component { 
-    state = [{
+export function OrderDisplay() { 
+    let state = [{
         id: 1, 
         date: '2023-04-10', 
         quantity: 1, 
@@ -34,11 +34,25 @@ export class OrderDisplay extends React.Component {
         park_id: null, 
         tkt_id: 1
     }] 
-
-    render() {
-        return <Order stateData={this.state} ></Order>
-    }
+    
+    useEffect(() => {
+        fetch('http://localhost:8080/visitlist') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            console.log("fetch data:" + data);
+            //setValue(data); 
+        })
+    });
+    
+    return <Order stateData={state} ></Order>
+    
 } 
+
+function Data() {
+    //const [value, setValue] = useState(null); 
+    
+    //return value; 
+}
 
 const allOptions = [{id: 0, type: 'All'}, {id: 1, type: 'Ticket'}, {id: 2, type: 'Store'}, 
     {id: 3, type: 'Show'}, {id: 5, type: 'Parking'}]; 
