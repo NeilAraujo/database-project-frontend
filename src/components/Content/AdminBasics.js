@@ -5,6 +5,8 @@ import { Tag, Table } from 'antd';
 import styled from 'styled-components'; 
 import './Admin.css'; 
 
+const { Column, ColumnGroup } = Table;
+
 const Tab = styled.button`
   font-size: 16px;
   font-style: bold;
@@ -82,106 +84,62 @@ function TapGroup() {
       );
 }
 
-class AllVisitors extends React.Component{
-    state = [
-    {
-        id: 1, 
-        name: 'Michael Smith',
-        address: '250 Ashland Place, Burlington, Vermont, United States', 
-        email: 'ms@gmail.com', 
-        telNum: '(332)-234-6910', 
-        type: 'M', 
-        birthDate: '1990-10-10'
-    }, {
-        id: 2, 
-        name: 'Michael Smith',
-        address: '250 Ashland Place, Burlington, Vermont, United States', 
-        email: 'ms@gmail.com', 
-        telNum: '(332)-234-6910', 
-        type: 'I', 
-        birthDate: '1990-10-10'
-    }, {
-        id: 3, 
-        name: 'Michael Smith',
-        address: '250 Ashland Place, Burlington, Vermont, United States', 
-        email: 'ms@gmail.com', 
-        telNum: '(332)-234-6910', 
-        type: 'S', 
-        birthDate: '1990-10-10'
-    }, {
-        id: 4, 
-        name: 'Michael Smith',
-        address: '250 Ashland Place, Burlington, Vermont, United States', 
-        email: 'ms@gmail.com', 
-        telNum: '(332)-234-6910', 
-        type: 'G', 
-        birthDate: '1990-10-10'
-    }] 
+function AllVisitors() { 
+    const [visitorData, setVisitorData] = useState([]); 
 
-    render() {
-        return (<ShowAllVisitors dataSource = {this.state} />)
-    }
+    useEffect(() => {
+        fetch('http://localhost:8080/visitor/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setVisitorData(data.data); 
+        })
+    }, []);
+    
+    return (<ShowAllVisitors visitorData={visitorData} />)
 
 } 
 
-function ShowAllVisitors({dataSource}) {
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'id', 
-            key: 'id', 
-        }, {
-            title: 'Name', 
-            dataIndex: 'name', 
-            key: 'name', 
-        }, {
-            title: 'Birth Date', 
-            dataIndex: 'birthDate', 
-            key: 'birthDate'
-        }, {
-            title: 'Address', 
-            dataIndex: 'address', 
-            key: 'address', 
-        }, {
-            title: 'Email', 
-            dataIndex: 'email', 
-            key: 'email', 
-        }, {
-            title: 'Tel Number', 
-            dataIndex: 'telNum', 
-            key: 'telNum', 
-        }, {
-            title: 'Type', 
-            dataIndex: 'type', 
-            key: 'type', 
-            render: (_, {type}) => {
-                if (type === 'M') {
-                    return (
-                    <Tag color = 'volcano'>
-                        {'Member'}
-                    </Tag>)
-                } else if (type === 'S') {
-                    return (
-                    <Tag color = 'purple'>
-                        {'Student'}
-                    </Tag>)
-                } else if (type === 'G') {
-                    return (
-                    <Tag color = 'geekblue'>
-                        {'Group'}
-                    </Tag>)
+function ShowAllVisitors({visitorData}) {
+    
+    return (
+    <Table dataSource={visitorData}>
+        <ColumnGroup title="Name">
+            <Column title="First Name" dataIndex="v_fname" key="v_fname" />
+            <Column title="Middle Name" dataIndex="v_mname" key="v_mname" />
+            <Column title="Last Name" dataIndex="v_lname" key="v_lname" />
+        </ColumnGroup>
+        <Column 
+            title="Type" 
+            dataIndex="v_type" 
+            key="v_type"
+            render = { (v_type) => {
+                if (v_type == 'M') {
+                    return <label>Member</label>
+                } else if (v_type == 'S') {
+                    return <label>Student</label>
+                } else if (v_type == 'G') {
+                    return <label>Group</label>
                 } else {
-                    return (
-                    <Tag color = 'green'>
-                        {'Individual'}
-                    </Tag>)
+                    return <label>Individual</label>
                 }
             }
-        }
-    ];
-    const data = dataSource;
-    
-    return (<Table columns={columns} dataSource={data} />);
+            } />
+        <Column 
+            title="Birth Date" 
+            dataIndex="v_bdate" 
+            key="v_bdate"
+            render = { (v_bdate) => 
+                <label>{v_bdate.substring(0, 10)}</label>
+            } />
+        <ColumnGroup title="Address">
+            <Column title="Street" dataIndex="v_stadd" key="v_stadd" />
+            <Column title="City" dataIndex="v_city" key="v_city" />
+            <Column title="State" dataIndex="v_state" key="v_state" />
+            <Column title="Country" dataIndex="v_country" key="v_country" />
+        </ColumnGroup>
+        <Column title="Email" dataIndex="v_email" key="v_email" />
+        <Column title="Tel Number" dataIndex="v_telnum" key="v_telnum" />
+    </Table>);
 }
 
 function AllTickets() { 
@@ -630,77 +588,63 @@ function ShowAllParkings({parkLot, parking}) {
 }
 
 
-class AllOrders extends React.Component{
-    state = [{
-        id: 1, 
-        date: '2023-04-10', 
-        quantity: 1, 
-        amount: 23, 
-        pay_id: 1, 
-        v_id: 1, 
-        sh_id: null, 
-        st_id: 1, 
-        mi_id: 1, 
-        park_id: null, 
-        tkt_id: null
-    }, {
-        id: 2, 
-        date: '2023-04-10', 
-        quantity: 1, 
-        amount: 32, 
-        pay_id: null, 
-        v_id: 1, 
-        sh_id: null, 
-        st_id: null, 
-        mi_id: null, 
-        park_id: null, 
-        tkt_id: 1
-    }] 
+function AllOrders() { 
+    const [orderData, setOrderData] = useState([]); 
 
-    render() {
-        return (<ShowAllOrders dataSource = {this.state} />)
-    }
+    useEffect(() => {
+        fetch('http://localhost:8080/order/list') 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setOrderData(data.data); 
+        })
+    }, []);
+    
+    return (<ShowAllOrders orderData={orderData} />)
+    
 }
 
-function ShowAllOrders({dataSource}) {
+function ShowAllOrders({orderData}) {
     const columns = [
         {
             title: 'ID', 
-            dataIndex: 'id', 
-            key: 'id', 
+            dataIndex: 'o_id', 
+            key: 'o_id', 
         }, {
             title: 'Date', 
-            dataIndex: 'date', 
-            key: 'date',
+            dataIndex: 'o_date', 
+            key: 'o_date',
+            render : (_, {o_date}) => {
+                return <label>{o_date.substring(0, 10)}</label>
+            }
         }, {
             title: 'Quantity', 
-            dataIndex: 'quantity', 
-            key: 'quantity', 
+            dataIndex: 'o_quantity', 
+            key: 'o_quantity', 
         }, {
             title: 'Amount', 
-            dataIndex: 'amount', 
-            key: 'amount', 
+            dataIndex: 'o_amount', 
+            key: 'o_amount', 
+        }, {
+            title: 'Visitor ID', 
+            dataIndex: 'v_id', 
+            key: 'v_id', 
         }, {
             title: 'Payment ID', 
             dataIndex: 'pay_id', 
             key: 'pay_id', 
             render: (_, {pay_id}) => {
-                if (pay_id === null) {
+                if (pay_id === 0) {
                     return <label>unpaid</label>
                 } else {
                     return <label>{pay_id}</label>
                 }
             }
         }, {
-            title: 'Visitor ID', 
-            dataIndex: 'v_id', 
-            key: 'v_id', 
-        }, {
             title: 'Show ID', 
             dataIndex: 'sh_id', 
             key: 'sh_id', 
             render: (_, {sh_id}) => {
-                if (sh_id === null) {
+                if (sh_id === 0) {
                     return <label>none</label>
                 } else {
                     return <label>{sh_id}</label>
@@ -711,7 +655,7 @@ function ShowAllOrders({dataSource}) {
             dataIndex: 'st_id', 
             key: 'st_id', 
             render: (_, {st_id}) => {
-                if (st_id === null) {
+                if (st_id === 0) {
                     return <label>none</label>
                 } else {
                     return <label>{st_id}</label>
@@ -722,7 +666,7 @@ function ShowAllOrders({dataSource}) {
             dataIndex: 'mi_id', 
             key: 'mi_id', 
             render: (_, {mi_id}) => {
-                if (mi_id === null) {
+                if (mi_id === 0) {
                     return <label>none</label>
                 } else {
                     return <label>{mi_id}</label>
@@ -733,7 +677,7 @@ function ShowAllOrders({dataSource}) {
             dataIndex: 'park_id', 
             key: 'park_id', 
             render: (_, {park_id}) => {
-                if (park_id === null) {
+                if (park_id === 0) {
                     return <label>none</label>
                 } else {
                     return <label>{park_id}</label>
@@ -744,7 +688,7 @@ function ShowAllOrders({dataSource}) {
             dataIndex: 'tkt_id', 
             key: 'tkt_id', 
             render: (_, {tkt_id}) => {
-                if (tkt_id === null) {
+                if (tkt_id === 0) {
                     return <label>none</label>
                 } else {
                     return <label>{tkt_id}</label>
@@ -752,7 +696,6 @@ function ShowAllOrders({dataSource}) {
             }
         },  
     ];
-    const data = dataSource;
     
-    return (<Table columns={columns} dataSource={data} />);
+    return (<Table columns={columns} dataSource={orderData} />);
 }
