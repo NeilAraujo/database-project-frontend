@@ -5,7 +5,6 @@ import '../Content/MyOrders.css';
 const MyOrders = () => {
     return (
         <div>
-            Orders
             <OrderDisplay />
         </div>
     );

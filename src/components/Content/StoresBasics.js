@@ -9,14 +9,15 @@ import './Stores.css';
 export function StoreDisplay() { 
     const [category, setCategory] = useState([]); 
     const [storeData, setStoreData] = useState([]); 
-    
+
     useEffect(() => {
         fetch('http://localhost:8080/store/listctg') 
         .then((response) => response.json()) 
         .then((data) => {
+            console.log("get category")
             setCategory(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/store/list') 
@@ -24,7 +25,7 @@ export function StoreDisplay() {
         .then((data) => {
             setStoreData(data.data); 
         })
-    }); 
+    }, []); 
 
     // for (let i = 0; i < storeData.length; i++) {
     //     let store = storeData[i]; 
@@ -80,7 +81,6 @@ function StoreBar({ctg_id, storeData}) {
 } 
 
 function GetMenu({st_id}) { 
-    console.log("store: " + st_id); 
     const [menuItems, setMenuItems] = useState([]); 
     const [count, setCount] = useState(0); 
     const settings = {
@@ -99,7 +99,7 @@ function GetMenu({st_id}) {
         .then((data) => {
             setMenuItems(data.data); 
             setCount(menuItems.length); 
-        })
+        }, [])
     });  
 
     if (count >= 3) {

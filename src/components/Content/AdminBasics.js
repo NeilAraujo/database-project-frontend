@@ -38,9 +38,6 @@ export class Analysis {
     
 }
 
-export class AllData {
-
-}
 
 function TapGroup() {
     const [activeTab, setActiveTab] = useState('All Visitors'); 
@@ -197,7 +194,7 @@ function AllTickets() {
         .then((data) => {
             setTypeData(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/ticket/list') 
@@ -205,7 +202,7 @@ function AllTickets() {
         .then((data) => {
             setTicketData(data.data); 
         })
-    }); 
+    }, []); 
 
         
     return (<ShowAllTickets typeData={typeData} ticketData={ticketData}/>)
@@ -281,7 +278,7 @@ function AllShows() {
         .then((data) => {
             setTypeData(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/show/list') 
@@ -289,7 +286,7 @@ function AllShows() {
         .then((data) => {
             setShowData(data.data); 
         })
-    });
+    }, []);
         
     return (<ShowAllShows typeData={typeData} showData={showData}/>)
         
@@ -374,7 +371,7 @@ function AllAttractions() {
         .then((data) => {
             setTypeData(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/attraction/listls') 
@@ -382,7 +379,7 @@ function AllAttractions() {
         .then((data) => {
             setLocation(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/attraction/list') 
@@ -390,7 +387,7 @@ function AllAttractions() {
         .then((data) => {
             setAttraction(data.data); 
         })
-    });
+    }, []);
         
     return (<ShowAllAttractions typeData={typeData} location={location} attraction={attraction}/>)
         
@@ -483,7 +480,7 @@ function AllStores() {
         .then((data) => {
             setCategory(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/store/list') 
@@ -491,7 +488,7 @@ function AllStores() {
         .then((data) => {
             setStoreData(data.data); 
         })
-    });
+    }, []);
 
     return (<ShowAllStores category={category} storeData={storeData}/>)
 }  
@@ -548,7 +545,7 @@ function GetMenu({st_id}) {
             setMenuItems(data.data); 
             console.log("menu items: " + menuItems); 
         })
-    }); 
+    }, []); 
 
     return (
         <ul>
@@ -571,7 +568,7 @@ function AllParkings() {
         .then((data) => {
             setParkLot(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/parking/list') 
@@ -579,7 +576,7 @@ function AllParkings() {
         .then((data) => {
             setParking(data.data); 
         })
-    });
+    }, []);
 
     return (<ShowAllParkings parkLot = {parkLot} parking = {parking} />)
     

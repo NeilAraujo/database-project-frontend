@@ -36,7 +36,7 @@ export function AttractionDisplay() {
       .then((data) => {
           setTypeData(data.data); 
       })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/attraction/list') 
@@ -44,7 +44,7 @@ export function AttractionDisplay() {
         .then((data) => {
             setAttraction(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
       fetch('http://localhost:8080/attraction/listls') 
@@ -52,7 +52,7 @@ export function AttractionDisplay() {
       .then((data) => {
           setLocation(data.data); 
       })
-    });
+    }, []);
 
     return (
       <div>

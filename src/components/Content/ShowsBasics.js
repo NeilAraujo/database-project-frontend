@@ -28,7 +28,7 @@ export function ShowDisplay() {
         .then((data) => {
             setTypeData(data.data); 
         })
-    });
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8080/show/list') 
@@ -36,7 +36,7 @@ export function ShowDisplay() {
         .then((data) => {
             setShowData(data.data); 
         })
-    });
+    }, []);
 
     return (
         <div style = {{display: 'flex', flexDirection: 'column'}}>
