@@ -10,7 +10,7 @@ import "slick-carousel/slick/slick-theme.css";
 export function ShowDisplay() { 
     const [typeData, setTypeData] = useState([]); 
     const [showData, setShowData] = useState([]); 
-    const [currentImg, setCurrentImg] = useState(1);      
+    const [currentImg, setCurrentImg] = useState(0);      
     const settings = {
         dots: true, //show the dots
         infinite: true, 

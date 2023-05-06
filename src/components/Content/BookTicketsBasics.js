@@ -45,7 +45,7 @@ export class BookDisplay extends React.Component {
             expireDate: null, 
             expireDateStr: '', 
             cvv: '', 
-            credit: '1', 
+            credit: '', 
             addCard: false, 
             paymentId: 0, 
             visitorId: 0, 
@@ -403,7 +403,7 @@ render() {
                                 <Input placeholder="security code" onChange = {this.handleCvv}/>
                             </Form.Item>
                             <Form.Item label="Credit">
-                                <Radio.Group onChange={this.handleCredit}>
+                                <Radio.Group onChange={this.handleCredit} defaultValue={"1"}>
                                     <Radio value="1"> Credit </Radio>
                                     <Radio value="0"> Debit </Radio>
                                 </Radio.Group>

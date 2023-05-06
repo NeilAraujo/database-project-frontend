@@ -1,11 +1,17 @@
 import React  from 'react';
 import { useState, useEffect } from 'react'; 
-import { Tag, Table } from 'antd'; 
+import { Tag, Table, Button, Form, Input, Radio, TimePicker, Alert, Modal } from 'antd'; 
 
 import styled from 'styled-components'; 
-import './Admin.css'; 
+import './Admin.css';  
 
-const { Column, ColumnGroup } = Table;
+import { AllVisitors } from './AdminTables'; 
+import { AllOrders } from './AdminTables'; 
+import { AllTickets } from './AdminTables'; 
+import { AllShows } from './AdminTables'; 
+import { AllAttractions } from './AdminTables'; 
+import { AllStores } from './AdminTables';
+import { AllParkings } from './AdminTables';
 
 const Tab = styled.button`
   font-size: 16px;
@@ -38,12 +44,12 @@ export function AdminDisplay() {
 
 export class Analysis {
     
-}
-
+} 
 
 function TapGroup() {
     const [activeTab, setActiveTab] = useState('All Visitors'); 
-    const titles = ['All Visitors', 'All Orders', 'All Tickets', 'All Shows', 'All Attractions', 'All Stores', 'All Parkings']; 
+    const titles = ['All Visitors', 'All Orders', 'All Tickets', 'All Shows', 'All Attractions', 'All Stores', 'All Parkings'];
+    
     return (
         <div className='tabGroupBox'>
           <ButtonGroup>
@@ -59,7 +65,7 @@ function TapGroup() {
           </ButtonGroup>
           <div className='tabContentBox'>
             {activeTab === 'All Visitors' && (
-                <AllVisitors />
+                <AllVisitors /> 
             )}
             {activeTab === 'All Orders' && (
                 <AllOrders />
@@ -68,13 +74,23 @@ function TapGroup() {
                 <AllTickets />
             )}    
             {activeTab === 'All Shows' && (
-                <AllShows />
+                <div>
+                    <AllShows />
+                    <AddShow />
+                </div>
             )}
             {activeTab === 'All Attractions' && (
-                <AllAttractions />
+                <div>
+                    <AllAttractions />
+                    <AddAttraction />
+                </div>
             )}
             {activeTab === 'All Stores' && (
-                <AllStores />
+                <div>
+                    <AllStores /> 
+                    <Button>Add Menu Item</Button> 
+                    <Button style={{marginLeft:40}}>Add Store Menu Item</Button>
+                </div>
             )}
             {activeTab === 'All Parkings' && (
                 <AllParkings />
@@ -84,681 +100,476 @@ function TapGroup() {
       );
 }
 
-function AllVisitors() { 
-    const [visitorData, setVisitorData] = useState([]); 
-
-    useEffect(() => {
-        fetch('http://localhost:8080/visitor/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setVisitorData(data.data); 
-        })
-    }, []);
-    
-    return (<ShowAllVisitors visitorData={visitorData} />)
-
-} 
-
-function ShowAllVisitors({visitorData}) {
-    
-    return (
-    <Table dataSource={visitorData}>
-        <Column title="ID" dataIndex="v_id" key="v_id" />
-        <ColumnGroup title="Name">
-            <Column title="First Name" dataIndex="v_fname" key="v_fname" />
-            <Column title="Middle Name" dataIndex="v_mname" key="v_mname" />
-            <Column title="Last Name" dataIndex="v_lname" key="v_lname" />
-        </ColumnGroup>
-        <Column 
-            title="Type" 
-            dataIndex="v_type" 
-            key="v_type"
-            render = { (v_type) => {
-                if (v_type == 'M') {
-                    return <label>Member</label>
-                } else if (v_type == 'S') {
-                    return <label>Student</label>
-                } else if (v_type == 'G') {
-                    return <label>Group</label>
-                } else {
-                    return <label>Individual</label>
-                }
-            }
-            } />
-        <Column 
-            title="Birth Date" 
-            dataIndex="v_bdate" 
-            key="v_bdate"
-            render = { (v_bdate) => 
-                <label>{v_bdate.substring(0, 10)}</label>
-            } />
-        <ColumnGroup title="Address">
-            <Column title="Street" dataIndex="v_stadd" key="v_stadd" />
-            <Column title="City" dataIndex="v_city" key="v_city" />
-            <Column title="State" dataIndex="v_state" key="v_state" />
-            <Column title="Country" dataIndex="v_country" key="v_country" />
-        </ColumnGroup>
-        <Column title="Email" dataIndex="v_email" key="v_email" />
-        <Column title="Tel Number" dataIndex="v_telnum" key="v_telnum" />
-    </Table>);
-}
-
-function AllTickets() { 
-    const [typeData, setTypeData] = useState([]);
-    const [ticketData, setTicketData] = useState([]); 
-
-    useEffect(() => {
-        fetch('http://localhost:8080/ticket/listtkttype') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setTypeData(data.data); 
-        })
-    }, []);
-
-    useEffect(() => {
-        fetch('http://localhost:8080/ticket/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setTicketData(data.data); 
-        })
-    }, []); 
-
-        
-    return (<ShowAllTickets typeData={typeData} ticketData={ticketData}/>)
-}
-
-function ShowAllTickets ({typeData, ticketData}) { 
-    function getType(tkttype_id) {
-        for (let i = 0; i < typeData.length; i++) {
-            if (typeData[i].tkttype_id === tkttype_id) {
-                return typeData[i].tkttype_name; 
-            }
+class AddShow extends React.Component { 
+    constructor() {
+        super();
+        this.state = {
+            showTypes: [], 
+            name: '', 
+            description: '', 
+            startTime: null, 
+            startTimeStr: '', 
+            endTime: null, 
+            endTimeStr: '', 
+            wheelchairAcc: '1', 
+            price: NaN, 
+            type: '', 
+            typeId: 0,
+            alertMessage: '', 
+            showAlert: false, 
+            success: false, 
         }
-        return ''; 
+        this.handleShowName = this.handleShowName.bind(this); 
+        this.handleShowDescription = this.handleShowDescription.bind(this); 
+        this.handleStartTime = this.handleStartTime.bind(this); 
+        this.handleEndTime = this.handleEndTime.bind(this); 
+        this.handleWheelchairAcc = this.handleWheelchairAcc.bind(this); 
+        this.handleShowPrice = this.handleShowPrice.bind(this); 
+        this.handleShowType = this.handleShowType.bind(this); 
+        this.getShowTypeId = this.getShowTypeId.bind(this); 
+        this.handleAddShow = this.handleAddShow.bind(this); 
     }
-
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'tkt_id', 
-            key: 'tkt_id', 
-        }, {
-            title: 'Type', 
-            dataIndex: 'tkttype_id', 
-            key: 'tkttype_id', 
-            render: (_, {tkttype_id}) => {
-                return <label>{getType(tkttype_id)}</label>
-            }
-        }, {
-            title: 'Method', 
-            dataIndex: 'tkt_online', 
-            key: 'tkt_online', 
-            render: (_, {tkt_online}) => {
-                if (tkt_online === '1.0') {
-                    return <label>online</label>
-                } else {
-                    return <label>onsite</label>
-                }
-            }
-        }, {
-            title: 'Visit Date', 
-            dataIndex: 'tkt_visit_date', 
-            key: 'tkt_visit_date', 
-            render: (_, {tkt_visit_date}) => {
-                return <label>{tkt_visit_date.substring(0, 10)}</label>
-            }
-        }, {
-            title: 'Price', 
-            dataIndex: 'tkt_price', 
-            key: 'tkt_price', 
-            render: (_, {tkt_price}) => {
-                return <label>${tkt_price}</label>
-            }
-        }, {
-            title: 'Discount', 
-            dataIndex: 'tkt_discount', 
-            key: 'tkt_discount', 
-            render: (_, {tkt_discount}) => {
-                return <label>{tkt_discount}%</label>
-            }
-        }, 
-    ];
     
-    return (<Table columns={columns} dataSource={ticketData} />);
-}
-
-function AllShows() { 
-    const [typeData, setTypeData] = useState([]); 
-    const [showData, setShowData] = useState([]); 
     
-    useEffect(() => {
+    componentDidMount() {
         fetch('http://localhost:8080/show/listshtype') 
         .then((response) => response.json()) 
         .then((data) => {
-            setTypeData(data.data); 
+            this.setState({
+                showTypes: data.data,
+            })
         })
-    }, []);
-
-    useEffect(() => {
-        fetch('http://localhost:8080/show/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setShowData(data.data); 
-        })
-    }, []);
-        
-    return (<ShowAllShows typeData={typeData} showData={showData}/>)
-        
-}
-
-function ShowAllShows ({ typeData, showData }) {
-    function getType(shtype_id) { 
-        for (let i = 0; i < typeData.length; i++) {
-            if (typeData[i].shtype_id === shtype_id) {
-                return typeData[i].shtype_name; 
-            }
-        }
-        return ''; 
     }
 
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'sh_id', 
-            key: 'sh_id', 
-        }, {
-            title: 'Name', 
-            dataIndex: 'sh_name', 
-            key: 'sh_name', 
-        }, {
-            title: 'Type', 
-            dataIndex: 'shtype_id', 
-            key: 'shtype_id', 
-            render: (_, {shtype_id}) => {
-                return <label>{getType(shtype_id)}</label>
+    handleShowName(e) {
+        this.setState({
+            name: e.target.value.trim(),
+        }, () => {})
+    }
+
+    handleShowDescription(e) {
+        this.setState({
+            description: e.target.value.trim(), 
+        }, () => {})
+    }
+
+    handleStartTime(time, timeStr) {
+        this.setState({
+            startTime: time, 
+            startTimeStr: timeStr, 
+        }, () => {})
+    }
+
+    handleEndTime(time, timeStr) {
+        this.setState({
+            endTime: time, 
+            endTimeStr: timeStr, 
+        }, () => {})
+    }
+
+    handleWheelchairAcc(e) {
+        this.setState({
+            wheelchairAcc: e.target.value, 
+        }, () => {})
+    }
+
+    handleShowPrice(e) { 
+        this.setState({
+            price: parseInt(e.target.value.trim()), 
+        }, () => {}) 
+    }
+
+    handleShowType(e) {
+        this.setState({
+            type: e.target.value, 
+        }, () => {
+            this.getShowTypeId();
+        })
+    }
+
+    getShowTypeId() {
+        for (let i = 0; i < this.state.showTypes.length; i++) {
+            if (this.state.showTypes[i].shtype_name === this.state.type) {
+                this.setState({
+                    typeId: this.state.showTypes[i].shtype_id, 
+                }, () => {})
             }
-        }, {
-            title: 'Description', 
-            dataIndex: 'sh_description', 
-            key: 'sh_description', 
-        }, {
-            title: 'Start Time', 
-            dataIndex: 'sh_start_time', 
-            key: 'sh_start_time', 
-            render: (_, {sh_start_time}) => {
-                return <label>{sh_start_time.substring(11, 19)}</label>
+        }
+    }
+
+    handleAddShow() {
+        console.log("type id: " + this.state.typeId) 
+        if (this.state.name === '' || this.state.description === '') {
+            this.setState({
+                alertMessage: "Show name and description cannot be null.", 
+                showAlert: true, 
+            }, () => {})
+        } else if (this.state.startTime === null || this.state.endTime === null || this.state.startTime >= this.state.endTime) {
+            this.setState({
+                alertMessage: "Show time cannot be null and start time must be before end time.", 
+                showAlert: true, 
+            }, () => {})
+        } else if (isNaN(this.state.price)) {
+            this.setState({
+                alertMessage: "Show price should be set to integer.", 
+                showAlert: true, 
+            }, () => {})
+        } else {
+            this.setState({
+                showAlert: false, 
+            }, () => {
+                const requestOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                }; 
+                const date = new Date(); 
+                const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate() 
+                const start = str + " " + this.state.startTimeStr
+                const end = str + " " + this.state.endTimeStr
+                fetch(`http://localhost:8080/show/add?shName=${this.state.name}&shDescription=${this.state.description}&shStartTime=${start}&shEndTime=${end}&shWheelchairAcc=${this.state.wheelchairAcc}&shPrice=${this.state.price}&shTypeId=${this.state.typeId}`, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("add show!") 
+                        this.setState({
+                            success: true
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    success: false
+                                })
+                            }, 3000);
+                        })
+                    });
+            })
+        }
+    } 
+
+    render() {
+        return (
+            <div className='operationBox'>
+                <div>
+            <Form labelCol={{
+                    span: 10,
+                  }}
+                  wrapperCol={{
+                    span: 14, 
+                  }}
+                  layout="horizontal" 
+                  style = {{marginTop: 30}}>
+                <Form.Item label="Show Name">
+                    <Input placeholder="name" onChange = {this.handleShowName}/>
+                </Form.Item>
+                <Form.Item label="Show Description">
+                    <Input placeholder="description" onChange = {this.handleShowDescription}/>
+                </Form.Item>
+                <Form.Item label="Start Time">
+                    <TimePicker onChange = {this.handleStartTime}/>
+                </Form.Item> 
+                <Form.Item label="End Time">
+                    <TimePicker onChange = {this.handleEndTime}/>
+                </Form.Item> 
+                <Form.Item label="Wheelchair Accessible">
+                    <Radio.Group onChange={this.handleWheelchairAcc} defaultValue={"1.0"}>
+                        <Radio value="1.0"> Yes </Radio>
+                        <Radio value="0.0"> No </Radio>
+                    </Radio.Group>
+                </Form.Item>
+                <Form.Item label="Show Price">
+                    <Input placeholder="price" onChange = {this.handleShowPrice}/>
+                </Form.Item>
+                <Form.Item label="Show Type">
+                    <Radio.Group onChange={this.handleShowType} defaultValue={"drama"}>
+                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'left'}}>
+                            <Radio value="drama"> Drama </Radio>
+                            <br />
+                            <Radio value="musical"> Musical </Radio>
+                            <br />
+                            <Radio value="comedy"> Comedy </Radio>
+                            <br />
+                            <Radio value="horror"> Horror </Radio>
+                            <br />
+                        </div>
+                    </Radio.Group>
+                </Form.Item>
+            </Form> 
+            </div>
+            {
+                (this.state.showAlert) ? (
+                    <Alert
+                        message="Error"
+                        description={this.state.alertMessage}
+                        type="error"
+                        showIcon 
+                        style = {{marginTop: 30, width: 400}}
+                    />
+                ) : null
             }
-        }, {
-            title: 'End Time', 
-            dataIndex: 'sh_end_time', 
-            key: 'sh_end_time', 
-            render: (_, {sh_end_time}) => {
-                return <label>{sh_end_time.substring(11, 19)}</label>
+            <Button onClick = {this.handleAddShow} style ={{marginTop: 20}}>Add Show</Button> 
+            {
+                (this.state.success) ? (
+                    <Alert style = {{marginTop:30}} message="Successfully Added!" type="success" showIcon />
+                ) : null
             }
-        }, {
-            title: 'Wheelchair Accessible', 
-            dataIndex: 'sh_wheelchair_acc', 
-            key: 'sh_wheelchair_acc', 
-            render: (_, {sh_wheelchair_acc}) => { 
-                if (sh_wheelchair_acc === '1.0') {
-                    return <label>Allowed</label>
-                } else {
-                    return <label>Not Allowed</label>
-                }
-            }
-        }, {
-            title: 'Price', 
-            dataIndex: 'sh_price', 
-            key: 'sh_price', 
-            render: (_, {sh_price}) => {
-                return <label>$ {sh_price}</label>
-            }
-        }, 
-    ];
+        </div>)
+    }
     
-    return (<Table columns={columns} dataSource={showData} />);
-}
+} 
 
-function AllAttractions() { 
-    const [typeData, setTypeData] = useState([]); 
-    const [location, setLocation] = useState([]);
-    const [attraction, setAttraction] = useState([]); 
-
-    useEffect(() => {
+class AddAttraction extends React.Component { 
+    constructor() {
+        super();
+        this.state = {
+            attractionTypes: [], 
+            locationSections: [], 
+            name: '', 
+            description: '', 
+            status: 'open', 
+            capacity: NaN, 
+            minimumHeight: NaN, 
+            duration: NaN, 
+            location: 'Lot A', 
+            locationId: 0, 
+            type: 'roller coaster', 
+            typeId: 0,
+            alertMessage: '', 
+            showAlert: false, 
+            success: false, 
+        }
+        this.handleName = this.handleName.bind(this); 
+        this.handleDescription = this.handleDescription.bind(this); 
+        this.handleStatus = this.handleStatus.bind(this); 
+        this.handleCapacity = this.handleCapacity.bind(this); 
+        this.handleMinimumHeight = this.handleMinimumHeight.bind(this); 
+        this.handleDuration = this.handleDuration.bind(this); 
+        this.handleLocation = this.handleLocation.bind(this); 
+        this.handleType = this.handleType.bind(this); 
+        this.handleAddAttraction = this.handleAddAttraction.bind(this); 
+    }
+    
+    
+    componentDidMount() {
         fetch('http://localhost:8080/attraction/listatttype') 
         .then((response) => response.json()) 
         .then((data) => {
-            setTypeData(data.data); 
+            this.setState({
+                attractionTypes: data.data,
+            }, () => {
+                fetch('http://localhost:8080/attraction/listls') 
+                .then((response) => response.json()) 
+                .then((data) => {
+                    this.setState({
+                        locationSections: data.data,
+                    })
+                })
+            })
         })
-    }, []);
-
-    useEffect(() => {
-        fetch('http://localhost:8080/attraction/listls') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setLocation(data.data); 
-        })
-    }, []);
-
-    useEffect(() => {
-        fetch('http://localhost:8080/attraction/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setAttraction(data.data); 
-        })
-    }, []);
-        
-    return (<ShowAllAttractions typeData={typeData} location={location} attraction={attraction}/>)
-        
-} 
-
-function ShowAllAttractions({typeData, location, attraction}) { 
-    function getType(atttype_id) { 
-        for (let i = 0; i < typeData.length; i++) {
-            if (typeData[i].atttype_id === atttype_id) {
-                return typeData[i].atttype_name; 
-            }
-        }
-        return ''; 
     }
 
-    function getLocation(ls_id) { 
-        for (let i = 0; i < location.length; i++) {
-            if (location[i].ls_id === ls_id) {
-                return location[i].ls_name; 
-            }
-        }
-        return ''; 
+    handleName(e) {
+        this.setState({
+            name: e.target.value.trim(),
+        }, () => {})
     }
 
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'att_id', 
-            key: 'att_id', 
-        }, {
-            title: 'Name', 
-            dataIndex: 'att_name', 
-            key: 'att_name', 
-        }, {
-            title: 'Type', 
-            dataIndex: 'atttype_id', 
-            key: 'atttype_id', 
-            render: (_, {atttype_id}) => {
-                return <label>{getType(atttype_id)}</label>
-            }
-        }, {
-            title: 'Description', 
-            dataIndex: 'att_description', 
-            key: 'att_description', 
-        }, {
-            title: 'Status', 
-            dataIndex: 'att_status', 
-            key: 'att_status', 
-        }, {
-            title: 'Capacity', 
-            dataIndex: 'att_capacity', 
-            key: 'att_capacity', 
-            render: (_, {att_capacity}) => {
-                return <label>{att_capacity} people</label>
-            }
-        }, {
-            title: 'Minimum Height', 
-            dataIndex: 'att_minimum_height', 
-            key: 'att_minimum_height', 
-            render: (_, {att_minimum_height}) => {
-                return <label>{att_minimum_height} cm</label>
-            }
-        }, {
-            title: 'Duration Time', 
-            dataIndex: 'att_duration_time', 
-            key: 'att_duration_time', 
-            render: (_, {att_duration_time}) => {
-                return <label>{att_duration_time} mins</label>
-            }
-        }, {
-            title: 'Location Section', 
-            dataIndex: 'ls_id', 
-            key: 'ls_id', 
-            render: (_, {ls_id}) => {
-                return <label>{getLocation(ls_id)}</label>
-            }
-        }, 
-    ];
-    
-    return (<Table columns={columns} dataSource={attraction} />);
-}
-
-function AllStores() {
-    const [category, setCategory] = useState([]); 
-    const [storeData, setStoreData] = useState([]); 
-
-    useEffect(() => {
-        fetch('http://localhost:8080/store/listctg') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setCategory(data.data); 
-        })
-    }, []);
-
-    useEffect(() => {
-        fetch('http://localhost:8080/store/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setStoreData(data.data); 
-        })
-    }, []);
-
-    return (<ShowAllStores category={category} storeData={storeData}/>)
-}  
-
-function ShowAllStores({category, storeData}) { 
-    function getCategory(ctg_id) {
-        for (let i = 0; i < category.length; i++) {
-            if (category[i].ctg_id === ctg_id) {
-                return category[i].ctg_name; 
-            }
-        }
-        return ''; 
+    handleDescription(e) {
+        this.setState({
+            description: e.target.value.trim(),
+        }, () => {})
     }
 
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'st_id', 
-            key: 'st_id', 
-        }, {
-            title: 'Name', 
-            dataIndex: 'st_name', 
-            key: 'st_name', 
-        }, {
-            title: 'Category', 
-            dataIndex: 'ctg_id', 
-            key: 'ctg_id', 
-            render: (_, {ctg_id}) => {
-                return <label>{getCategory(ctg_id)}</label>
-            }
-        }, {
-            title: 'Description', 
-            dataIndex: 'st_description', 
-            key: 'st_description', 
-        }, {
-            title: 'Menu Items', 
-            dataIndex: 'st_id', 
-            key: 'st_id', 
-            render: (_, {st_id}) => {
-                return <GetMenu st_id={st_id} />
-            }
-        },  
-    ];
+    handleStatus(e) {
+        this.setState({
+            status: e.target.value,
+        }, () => {})
+    }
 
-    return (<Table columns={columns} dataSource={storeData} />);
-} 
+    handleCapacity(e) {
+        this.setState({
+            capacity: parseInt(e.target.value.trim()), 
+        }, () => {
+            console.log("capacity: " + this.state.capacity)
+        }) 
+    }
 
-function GetMenu({st_id}) {
-    const [menuItems, setMenuItems] = useState([]); 
-    useEffect(() => {
-        fetch(`http://localhost:8080/store/getmi?stId=${st_id}`) 
-        .then((response) => response.json()) 
-        .then((data) => { 
-            setMenuItems(data.data); 
-            console.log("menu items: " + menuItems); 
+    handleMinimumHeight(e) {
+        this.setState({
+            minimumHeight: parseInt(e.target.value.trim()), 
+        }, () => {
+            console.log("minimum height: " + this.state.minimumHeight)
+        }) 
+    }
+
+    handleDuration(e) {
+        this.setState({
+            duration: parseInt(e.target.value.trim()), 
+        }, () => {
+            console.log("duration time: " + this.state.duration)
+        }) 
+    }
+
+    handleLocation(e) {
+        this.setState({
+            location: e.target.value,
+        }, () => {
+            this.getLocationId();
         })
-    }, []); 
+    }
 
-    return (
-        <ul>
+    handleType(e) {
+        this.setState({
+            type: e.target.value,
+        }, () => {
+            this.getTypeId();
+        })
+    }
+   
+
+    getTypeId() {
+        for (let i = 0; i < this.state.attractionTypes.length; i++) {
+            if (this.state.attractionTypes[i].atttype_name === this.state.type) {
+                this.setState({
+                    typeId: this.state.attractionTypes[i].atttype_id, 
+                }, () => {})
+            }
+        }
+    } 
+
+    getLocationId() {
+        for (let i = 0; i < this.state.locationSections.length; i++) {
+            if (this.state.locationSections[i].ls_name === this.state.location) {
+                this.setState({
+                    locationId: this.state.locationSections[i].ls_id, 
+                }, () => {})
+            }
+        }
+    }
+
+    handleAddAttraction() {
+        if (this.state.name === '' || this.state.description === '') {
+            this.setState({
+                alertMessage: "Attraction name and description cannot be null.", 
+                showAlert: true, 
+            }, () => {})
+        } else if (isNaN(this.state.capacity) || isNaN(this.state.minimumHeight) || isNaN(this.state.duration)) {
+            this.setState({
+                alertMessage: "Attraction capacity, minimum hieght or duration time should be integer.", 
+                showAlert: true, 
+            }, () => {})
+        } else {
+            this.setState({
+                showAlert: false, 
+            }, () => {
+                const requestOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                }; 
+                fetch(`http://localhost:8080/attraction/add?attName=${this.state.name}&attDescription=${this.state.description}&attStatus=${this.state.status}&attCapacity=${this.state.capacity}&attMinimumHeight=${this.state.minimumHeight}&attDurationTime=${this.state.duration}&lsId=${this.state.locationId}&attTypeId=${this.state.typeId}`, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.setState({
+                            success: true
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    success: false
+                                })
+                            }, 3000);
+                        })
+                    });
+            })
+        }
+    }
+
+    render() {
+        return (
+            <div className='operationBox'>
+                <div>
+            <Form labelCol={{
+                    span: 12,
+                  }}
+                  wrapperCol={{
+                    span: 14, 
+                  }}
+                  layout="horizontal" 
+                  style = {{marginTop: 30}}>
+                <Form.Item label="Attraction Name">
+                    <Input placeholder="name" onChange = {this.handleName}/>
+                </Form.Item>
+                <Form.Item label="Attraction Description">
+                    <Input placeholder="description" onChange = {this.handleDescription}/>
+                </Form.Item>
+                <Form.Item label="Attraction Status">
+                    <Radio.Group onChange={this.handleStatus} defaultValue={"open"}>
+                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'left'}}>
+                            <Radio value="open"> Open </Radio>
+                            <br />
+                            <Radio value="under maintenance"> Under Maintenance </Radio>
+                            <br />
+                            <Radio value="closed"> Closed </Radio>
+                            <br />
+                        </div>
+                    </Radio.Group>
+                </Form.Item>
+                <Form.Item label="Attraction Capacity">
+                    <Input placeholder="capacity" onChange = {this.handleCapacity}/>
+                </Form.Item>
+                <Form.Item label="Attraction Minium Height">
+                    <Input placeholder="minimum height" onChange = {this.handleMinimumHeight}/>
+                </Form.Item>
+                <Form.Item label="Attraction Duration Time">
+                    <Input placeholder="duration time" onChange = {this.handleDuration}/>
+                </Form.Item>
+                <Form.Item label="Attraction Type">
+                    <Radio.Group onChange={this.handleType} defaultValue={"roller coaster"}>
+                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'left'}}>
+                            <Radio value="roller coaster"> Roller Coaster </Radio>
+                            <br />
+                            <Radio value="water ride"> Water Ride </Radio>
+                            <br />
+                            <Radio value="dark ride"> Dark Ride </Radio>
+                            <br />
+                            <Radio value="kid ride"> Kid Ride </Radio>
+                            <br />
+                            <Radio value="vr ride"> VR Ride </Radio>
+                            <br />
+                        </div>
+                    </Radio.Group>
+                </Form.Item>
+                <Form.Item label="Location Section">
+                    <Radio.Group onChange={this.handleLocation} defaultValue={"Lot A"}>
+                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'left'}}>
+                            <Radio value="Lot A"> Lot A </Radio>
+                            <br />
+                            <Radio value="Lot B"> Lot B </Radio>
+                            <br />
+                            <Radio value="Lot C"> Lot C </Radio>
+                            <br />
+                            <Radio value="Lot D"> Lot D </Radio>
+                            <br />
+                        </div>
+                    </Radio.Group>
+                </Form.Item>
+            </Form> 
+            </div>
             {
-                menuItems.map((item, index) => (
-                    <li>{item.mi_name}: $ {item.mi_unit_price}</li>
-                ))
+                (this.state.showAlert) ? (
+                    <Alert
+                        message="Error"
+                        description={this.state.alertMessage}
+                        type="error"
+                        showIcon 
+                        style = {{marginTop: 30, width: 400}}
+                    />
+                ) : null
             }
-        </ul>
-    );
-}
-
-function AllParkings() {
-    const [parkLot, setParkLot] = useState([]); 
-    const [parking, setParking] = useState([]); 
-
-    useEffect(() => {
-        fetch('http://localhost:8080/parking/listpl') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setParkLot(data.data); 
-        })
-    }, []);
-
-    useEffect(() => {
-        fetch('http://localhost:8080/parking/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setParking(data.data); 
-        })
-    }, []);
-
-    return (<ShowAllParkings parkLot = {parkLot} parking = {parking} />)
-    
-}  
-
-function ShowAllParkings({parkLot, parking}) {
-     function getParkLot(pl_id) {
-        for (let i = 0; i < parkLot.length; i++) {
-            if (parkLot[i].pl_id === pl_id) {
-                return parkLot[i].pl_name; 
+            <Button onClick = {this.handleAddAttraction} style ={{marginTop: 20}}>Add Attraction</Button> 
+            {
+                (this.state.success) ? (
+                    <Alert style = {{marginTop:30}} message="Successfully Added!" type="success" showIcon />
+                ) : null
             }
-        }
-        return ''; 
+        </div>)
     }
-
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'park_id', 
-            key: 'park_id', 
-        }, {
-            title: 'Time in', 
-            dataIndex: 'park_time_in', 
-            key: 'park_time_in', 
-        }, {
-            title: 'Time out', 
-            dataIndex: 'park_time_out', 
-            key: 'park_time_out', 
-        }, {
-            title: 'Fee per Hour', 
-            dataIndex: 'park_fee', 
-            key: 'park_fee', 
-            render: (_, {park_fee}) => {
-                return <label>$ {park_fee}</label>
-            }
-        }, {
-            title: 'Spot Number', 
-            dataIndex: 'park_spotno', 
-            key: 'park_spotno', 
-        }, {
-            title: 'Parking Lot', 
-            dataIndex: 'pl_id', 
-            key: 'pl_id', 
-            render: (_, {pl_id}) => {
-                return <label>{getParkLot(pl_id)}</label>
-            }
-        },   
-    ];
-
-    return (<Table columns={columns} dataSource={parking} />);
-}
-
-
-function AllOrders() { 
-    const [orderData, setOrderData] = useState([]); 
-
-    useEffect(() => {
-        fetch('http://localhost:8080/order/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setOrderData(data.data); 
-        })
-    }, []);
-    
-    return (<ShowAllOrders orderData={orderData} />)
     
 }
 
-function ShowAllOrders({orderData}) {
-    const columns = [
-        {
-            title: 'ID', 
-            dataIndex: 'o_id', 
-            key: 'o_id', 
-        }, {
-            title: 'Date', 
-            dataIndex: 'o_date', 
-            key: 'o_date',
-            render: (_, {o_date}) => {
-                return <label>{o_date.substring(0, 10)}</label>
-            }
-        }, {
-            title: 'Quantity', 
-            dataIndex: 'o_quantity', 
-            key: 'o_quantity', 
-        }, {
-            title: 'Amount', 
-            dataIndex: 'o_amount', 
-            key: 'o_amount', 
-        }, {
-            title: 'Visitor ID', 
-            dataIndex: 'v_id', 
-            key: 'v_id', 
-        }, {
-            title: 'Payment ID', 
-            dataIndex: 'pay_id', 
-            key: 'pay_id', 
-            render: (_, {pay_id}) => {
-                if (pay_id === null) {
-                    return <label>unpaid</label>
-                } else {
-                    return <label>{pay_id}</label>
-                }
-            }
-        }, {
-            title: 'Payment Method', 
-            dataIndex: 'pay_id', 
-            key: 'pay_id', 
-            render: (_, {pay_id}) => {
-                if (pay_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <GetPayment pay_id = {pay_id} />
-                }
-            }
-        }, {
-            title: 'Payment Time', 
-            dataIndex: 'pay_id', 
-            key: 'pay_id', 
-            render: (_, {pay_id}) => {
-                if (pay_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <GetPaymentTime pay_id = {pay_id} />
-                }
-            }
-        }, {
-            title: 'Show ID', 
-            dataIndex: 'sh_id', 
-            key: 'sh_id', 
-            render: (_, {sh_id}) => {
-                if (sh_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <label>{sh_id}</label>
-                }
-            }
-        }, {
-            title: 'Store ID', 
-            dataIndex: 'st_id', 
-            key: 'st_id', 
-            render: (_, {st_id}) => {
-                if (st_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <label>{st_id}</label>
-                }
-            }
-        }, {
-            title: 'Menu Item ID', 
-            dataIndex: 'mi_id', 
-            key: 'mi_id', 
-            render: (_, {mi_id}) => {
-                if (mi_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <label>{mi_id}</label>
-                }
-            }
-        }, {
-            title: 'Parking ID', 
-            dataIndex: 'park_id', 
-            key: 'park_id', 
-            render: (_, {park_id}) => {
-                if (park_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <label>{park_id}</label>
-                }
-            }
-        }, {
-            title: 'Ticket ID', 
-            dataIndex: 'tkt_id', 
-            key: 'tkt_id', 
-            render: (_, {tkt_id}) => {
-                if (tkt_id === null) {
-                    return <label>none</label>
-                } else {
-                    return <label>{tkt_id}</label>
-                }
-            }
-        },  
-    ];
-    
-    return (<Table columns={columns} dataSource={orderData} />);
-} 
-
-function GetPayment({pay_id}) {
-    const [payment, setPayment] = useState([]); 
-    const [cardNumber, setCardNumber] = useState(''); 
-    const [cardCredit, setCardCredit] = useState(false); 
-
-    useEffect(() => {
-        fetch(`http://localhost:8080/payment/get?payId=${pay_id}`) 
-        .then((response) => response.json()) 
-        .then((data) => { 
-            setPayment(data.data); 
-        })
-    }, []); 
-
-    useEffect(() => {
-        fetch(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
-        .then((response) => response.json()) 
-        .then((data) => { 
-            setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
-            setCardCredit((data.data.cd_credit === '1.0' ? true : false)); 
-        })
-    }, []); 
-
-    return payment.pay_method === 'CA' ? <label>Cash</label> : (cardCredit? <label>Credit Card: ****{cardNumber}</label> : <label>Debit Card: ****{cardNumber}</label>)
-
-} 
-
-function GetPaymentTime({ pay_id }) {
-    const [payTime, setPayTime] = useState(''); 
-
-    useEffect(() => {
-        fetch(`http://localhost:8080/payment/get?payId=${pay_id}`) 
-        .then((response) => response.json()) 
-        .then((data) => { 
-            setPayTime(data.data.pay_time); 
-        })
-    }, []); 
-
-    return <label>{payTime}</label>
-}

@@ -34,9 +34,7 @@ export function AttractionDisplay() {
       fetch('http://localhost:8080/attraction/listatttype') 
       .then((response) => response.json()) 
       .then((data) => {
-          console.log("attractions: " + data.data); 
           setTypeData(data.data); 
-          console.log("attractions: " + typeData); 
       })
     }, []);
 
@@ -46,7 +44,7 @@ export function AttractionDisplay() {
         .then((data) => {
             setAttraction(data.data); 
         })
-    }, []);
+    }, []); 
 
     useEffect(() => {
       fetch('http://localhost:8080/attraction/listls') 
@@ -55,6 +53,42 @@ export function AttractionDisplay() {
           setLocation(data.data); 
       })
     }, []);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+      body: JSON.stringify({
+        accEmail: 'qz@gmail.com', 
+        accPwd: 'qz@gmail.com'
+      })
+    }; 
+
+    useEffect(() => {
+      fetch('http://localhost:8080/account/login', requestOptions) 
+      .then((response) => {
+        response.json().then((data) => {
+          console.log("login: " + data.message) 
+          //sessionStorage.setItem('userInfo', data.data)
+          if (data.success === true) {
+            console.log("role: " + data.data);
+            fetch('http://localhost:8080/account/getrole') 
+            .then((response) => response.json()) 
+            .then((data) => {
+              console.log("role: " + data.data);
+            })
+          }
+        })
+      }) 
+  }, []); 
+
+//   useEffect(() => {
+//     fetch('http://localhost:8080/account/getrole') 
+//     .then((response) => response.json()) 
+//     .then((data) => {
+//       console.log("get role: " + data.message) 
+//     })
+// }, []); 
+
 
     return (
       <div>
