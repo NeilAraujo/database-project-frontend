@@ -1,8 +1,7 @@
 import React, { useState, useEffect }  from 'react';
 import { Link } from 'react-router-dom'; 
 import { DatePicker } from 'antd';
-import { Radio } from 'antd';
-import { Button, Steps, Result } from 'antd';
+import { Button, Steps, Result, Radio } from 'antd';
 import { Input } from 'antd'; 
 import { DeleteOutlined } from '@ant-design/icons'; 
 import { Alert } from 'antd';
@@ -64,6 +63,7 @@ export class BookDisplay extends React.Component {
         this.handleCardNumber = this.handleCardNumber.bind(this); 
         this.handleExDate = this.handleExDate.bind(this);
         this.handleCvv = this.handleCvv.bind(this);
+        this.handleCredit = this.handleCredit.bind(this); 
     } 
 
     getVisitorId() {
@@ -310,6 +310,12 @@ export class BookDisplay extends React.Component {
         })
     }
 
+    handleCredit(e) {
+        this.setState ({
+            credit: e.target.value
+        })
+    }
+
     handlePay() { 
         const now = new Date(); 
         if (this.state.cardName === '' || this.state.cardNumber === '' || this.state.cvv === '') {
@@ -395,6 +401,12 @@ render() {
                             </Form.Item> 
                             <Form.Item label="CVV">
                                 <Input placeholder="security code" onChange = {this.handleCvv}/>
+                            </Form.Item>
+                            <Form.Item label="Radio">
+                                <Radio.Group onChange={this.handleCredit}>
+                                    <Radio value="1"> Credit </Radio>
+                                    <Radio value="0"> Debit </Radio>
+                                </Radio.Group>
                             </Form.Item>
                         </Form> 
                         {

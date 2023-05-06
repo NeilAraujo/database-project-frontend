@@ -103,7 +103,7 @@ function ShowAllVisitors({visitorData}) {
     
     return (
     <Table dataSource={visitorData}>
-        <Column title="Id" dataIndex="v_id" key="v_id" />
+        <Column title="ID" dataIndex="v_id" key="v_id" />
         <ColumnGroup title="Name">
             <Column title="First Name" dataIndex="v_fname" key="v_fname" />
             <Column title="Middle Name" dataIndex="v_mname" key="v_mname" />
@@ -614,6 +614,9 @@ function ShowAllOrders({orderData}) {
             title: 'Date', 
             dataIndex: 'o_date', 
             key: 'o_date',
+            render: (_, {o_date}) => {
+                return <label>{o_date.substring(0, 10)}</label>
+            }
         }, {
             title: 'Quantity', 
             dataIndex: 'o_quantity', 
@@ -635,6 +638,28 @@ function ShowAllOrders({orderData}) {
                     return <label>unpaid</label>
                 } else {
                     return <label>{pay_id}</label>
+                }
+            }
+        }, {
+            title: 'Payment Method', 
+            dataIndex: 'pay_id', 
+            key: 'pay_id', 
+            render: (_, {pay_id}) => {
+                if (pay_id === null) {
+                    return <label>none</label>
+                } else {
+                    return <GetPayment pay_id = {pay_id} />
+                }
+            }
+        }, {
+            title: 'Payment Time', 
+            dataIndex: 'pay_id', 
+            key: 'pay_id', 
+            render: (_, {pay_id}) => {
+                if (pay_id === null) {
+                    return <label>none</label>
+                } else {
+                    return <GetPaymentTime pay_id = {pay_id} />
                 }
             }
         }, {
@@ -698,7 +723,42 @@ function ShowAllOrders({orderData}) {
     return (<Table columns={columns} dataSource={orderData} />);
 } 
 
-function GetPayment(pay_id) {
+function GetPayment({pay_id}) {
     const [payment, setPayment] = useState([]); 
-    
+    const [cardNumber, setCardNumber] = useState(''); 
+    const [cardCredit, setCardCredit] = useState(false); 
+
+    useEffect(() => {
+        fetch(`http://localhost:8080/payment/get?payId=${pay_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => { 
+            setPayment(data.data); 
+        })
+    }, []); 
+
+    useEffect(() => {
+        fetch(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => { 
+            setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
+            setCardCredit((data.data.cd_credit === '1.0' ? true : false)); 
+        })
+    }, []); 
+
+    return payment.pay_method === 'CA' ? <label>Cash</label> : (cardCredit? <label>Credit Card: ****{cardNumber}</label> : <label>Debit Card: ****{cardNumber}</label>)
+
+} 
+
+function GetPaymentTime({ pay_id }) {
+    const [payTime, setPayTime] = useState(''); 
+
+    useEffect(() => {
+        fetch(`http://localhost:8080/payment/get?payId=${pay_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => { 
+            setPayTime(data.data.pay_time); 
+        })
+    }, []); 
+
+    return <label>{payTime}</label>
 }
