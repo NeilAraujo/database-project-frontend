@@ -1,15 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import './CustLogin.css'
+import {Link,NavLink, useNavigate} from 'react-router-dom'
+import AppContext from '../../../AppContext';
 
 const CustLogin = () => {
     const [email, onChangeEmail] = useState('');
     const [password, onChangePassword] = useState('');
+    const myContext = useContext(AppContext);
+    const [loginerror,setLoginError] = useState(false)
+
+    const HandleLogin = () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                accEmail: email,
+                accPwd: password
+            })
+        };
+        fetch('http://localhost:8080/account/login', requestOptions)
+            .then(response => response.json())
+            .then(data => { 
+                console.log(data)
+                if(data.success === true){
+                    fetch('http://localhost:8080/account/getrole')
+                    .then(response=>response.json())
+                    .then(data=> {
+                        console.log(data)
+                    })
+                    setLoginError(false)
+                    // myContext.setLogin(true)
+                }else{
+                    setLoginError(true)
+                }
+            });
+        // fetch('http://localhost:8080/account/getrole')
+        //     .then(response=>response.json())
+        //     .then(data=> {
+        //         console.log(data)
+        //     })
+    }
 
     return (
         <div style={{
             display: 'flex',
-            height:'50vh',
-            width: '50vh',
+            height:'100%',
+            width: '100%',
             flexDirection: 'column',
             alignSelf: 'center',
             alignItems: 'center',
@@ -17,9 +53,10 @@ const CustLogin = () => {
             backgroundColor: '#ffffff',
             borderRadius: 20
         }}>
-            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'bold',marginBottom:20}}>Login</div>
+            <img src={require('../../../logo.png')} style={{width:79,height:76,margin:10}}/>
+            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'bold',marginBottom:20,marginTop:10}}>Login</div>
 
-            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:40,marginBottom:10}}>Email</div>
+            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:70,marginBottom:10}}>Email</div>
             <input
                 style={{width:'80%',height:30,marginBottom:20,borderRadius:6}}
                 value={email} // ...force the input's value to match the state variable...
@@ -27,7 +64,7 @@ const CustLogin = () => {
                 placeholder='Enter Email'
                 />
 
-            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:40,marginBottom:10}}>Password</div>
+            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:70,marginBottom:10}}>Password</div>
             <input
                 style={{width:'80%',height:30,marginBottom:20,borderRadius:6}}
                 value={password} // ...force the input's value to match the state variable...
@@ -36,15 +73,31 @@ const CustLogin = () => {
                 type="password"
                 />
 
-            <button onClick={()=>console.log("Pressed")} style={{width:'30%',height:40,borderRadius:20,backgroundColor:'black',color:'white',fontFamily:16,marginTop:15}}>Login</button>
+            {
+                 loginerror &&    
+                 <div style={{fontSize:15,color:'red',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'center',marginBottom:10}}>Incorrect Email or Password</div>
+            }
+
+
+           
+           <button onClick={()=>HandleLogin()} style={{width:'30%',height:40,borderRadius:20,backgroundColor:'black',color:'white',fontFamily:16,marginTop:15}}>Login</button>
+           {/* <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:70,marginBottom:10}}>{}</div> */}
 
             <div style={{fontSize:12,color:'black',fontFamily:'sans-serif',fontWeight:'initial',marginTop:10}}>
-                Don't have an Account?<div style={{textDecoration:'underline'}} onClick={()=>{}}>Sign Up</div>
-            </div>
+                Don't have an Account?
+                </div>
+                {/* <div style={{textDecoration:'underline'}} onClick={()=>SignUpNav}>Sign Up</div> */}
+                <Link to="/custsignup">SignUp</Link>
+        
 
-            <div style={{fontSize:12,color:'black',fontFamily:'sans-serif',fontWeight:'initial',marginTop:10}}>
-                Employee Login<div style={{textDecoration:'underline'}} onClick={()=>{}}>Login</div>
+            {/* <div style={{fontSize:12,color:'black',fontFamily:'sans-serif',fontWeight:'initial',marginTop:10, marginRight: 1}}>
+                Employee Login
             </div>
+                    <Link to="/emplogin">
+                        Login
+                    </Link>
+                  */}
+           
         </div>
     );
 };
