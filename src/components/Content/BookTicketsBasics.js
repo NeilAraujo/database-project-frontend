@@ -49,6 +49,7 @@ export class BookDisplay extends React.Component {
             credit: '1', 
             addCard: false, 
             paymentId: 0, 
+            visitorId: 0, 
             age: 0, 
             visitorType: 'I', 
             numPurchased: 0,
@@ -63,6 +64,22 @@ export class BookDisplay extends React.Component {
         this.handleCardNumber = this.handleCardNumber.bind(this); 
         this.handleExDate = this.handleExDate.bind(this);
         this.handleCvv = this.handleCvv.bind(this);
+    } 
+
+    getVisitorId() {
+        const newOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        }
+        fetch(`http://localhost:8080/account/getid`, newOptions)
+        .then(response => response.json())
+        .then(data => {
+            this.setState({ visitorId: data.data }, () => {
+                console.log("visitor id: " + this.state.visitorId); 
+                this.calculateDiscount(); 
+            })
+        });
+
     }
 
     calculateDiscount() {
@@ -149,7 +166,11 @@ export class BookDisplay extends React.Component {
         }
     }
 
-    memberDiscount() {
+    memberDiscount() { 
+        const updateOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        };
         //member discoutn: 10%
         if (this.state.visitorType === 'M' && Date.parse(this.state.memberEndDate.substring(0, 10)) > Date.parse(this.state.visitDateStr) && this.state.numPurchased < 5) {
             this.setState({
@@ -157,6 +178,10 @@ export class BookDisplay extends React.Component {
             }, () => {
                 console.log("member discount: " + this.state.discount); 
                 this.addTicket(); 
+                //update the number purchased in member 
+                fetch(`http://localhost:8080/visitor/updatenumberp?vId=${this.state.visitorId}&mNumPurchased=${this.state.numPurchased + 1}`, updateOptions)
+                    .then(response => response.json())
+                    .then(data => {});
             }) 
         } else {
             console.log("member end date: " + this.state.memberEndDate.substring(0, 10));
@@ -171,19 +196,18 @@ export class BookDisplay extends React.Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-        };
+        }; 
         this.setState({
             price: this.state.price * (1 - this.state.discount * 0.01)
         }, () => {
             fetch(`http://localhost:8080/ticket/add?tktOnline=1&tktVisitDate=${this.state.visitDateStr}&tktPrice=${this.state.price}&tktDiscount=${this.state.discount}&tktIspaid=0&tktTypeId=${this.state.ticketType}`, requestOptions)
             .then(response => response.json())
             .then(data => {
-                this.setState({ ticketId: data }, () => {
+                this.setState({ ticketId: data }, () => { 
                     console.log("ticket id: " + this.state.ticketId); 
                     const date = new Date(); 
                     const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate()
-                    console.log("time: " + str)
-                    fetch(`http://localhost:8080/order/createorder?oDate=${str}&oQuantity=1&oAmount=${this.state.price}&vId=12&tktId=${this.state.ticketId}`, requestOptions)
+                    fetch(`http://localhost:8080/order/createorder?oDate=${str}&oQuantity=1&oAmount=${this.state.price}&vId=${this.state.visitorId}&tktId=${this.state.ticketId}`, requestOptions)
                     .then(response => response.json())
                     .then(data => {
                         this.setState({ orderId: data.data }, () => {
@@ -256,7 +280,7 @@ export class BookDisplay extends React.Component {
                 showAlert: false, 
                 step: 1,  
             })
-            this.calculateDiscount(); 
+            this.getVisitorId(); 
         } 
     }  
 

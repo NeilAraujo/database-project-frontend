@@ -103,6 +103,7 @@ function ShowAllVisitors({visitorData}) {
     
     return (
     <Table dataSource={visitorData}>
+        <Column title="Id" dataIndex="v_id" key="v_id" />
         <ColumnGroup title="Name">
             <Column title="First Name" dataIndex="v_fname" key="v_fname" />
             <Column title="Middle Name" dataIndex="v_mname" key="v_mname" />
@@ -695,4 +696,9 @@ function ShowAllOrders({orderData}) {
     ];
     
     return (<Table columns={columns} dataSource={orderData} />);
+} 
+
+function GetPayment(pay_id) {
+    const [payment, setPayment] = useState([]); 
+    
 }
