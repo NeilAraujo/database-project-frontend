@@ -25,7 +25,7 @@ export function ShowDisplay() {
     useEffect(() => {
         fetch('http://localhost:8080/show/listshtype') 
         .then((response) => response.json()) 
-        .then((data) => {
+        .then((data) => { 
             setTypeData(data.data); 
         })
     }, []);

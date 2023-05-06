@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useState, useEffect }  from 'react';
 import { Link } from 'react-router-dom'; 
 import { DatePicker } from 'antd';
 import { Radio } from 'antd';
@@ -9,123 +9,255 @@ import { Alert } from 'antd';
 import { Home } from '../Navbar/Home'; 
 import './BookTickets.css'; 
 
-const steps = ['Book a ticket', 'Make a payment', 'Done!']
+import {
+  Form,
+} from 'antd';
+
+const steps = ['Book a ticket', 'Make a payment', 'Done!'] 
+const items = steps.map((item) => ({
+    key: item.title,
+    title: item.title,
+}));
+
+const holidays = ['12-24', '12-25']
+
+const ticketTypes = ['', 'child', 'adult', 'senior']
 
 export class BookDisplay extends React.Component { 
-    constructor() {
+    constructor () {
         super(); 
         this.state = {
-            stepIndex: 0,
-            visitDate: null,
-            visitDateStr: '',
-            count: 0, 
+            step: 0, 
+            visitDate: null, 
+            visitDateStr: '', 
             alertMessage: '', 
-            showAlert: false,
-            showPayment: false,
-            otherAccount: '', 
-            addedAccount: [], 
-            ticketPrice: 100, 
+            showAlert: false, 
+            online: 1, 
+            isPaid: 0, 
+            price: 100, 
+            discount: 5, 
+            ticketType: 2, 
+            birthDate: null, 
+            birthDateStr: '', 
+            ticketId: 0,
+            orderId: 0, 
             cardName: '', 
             cardNumber: '', 
-            exDate: null, 
-            exDateStr: '',
+            expireDate: null, 
+            expireDateStr: '', 
             cvv: '', 
-            credit: true,
-        }; 
-        this.handleCountChange = this.handleCountChange.bind(this);
-        this.handleAccountChange = this.handleAccountChange.bind(this);
-        this.handleAddAccount = this.handleAddAccount.bind(this); 
-        this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
+            credit: '1', 
+            addCard: false, 
+            paymentId: 0, 
+            age: 0, 
+            visitorType: 'I', 
+            numPurchased: 0,
+            memberEndDate: '', 
+
+        }
+
+        this.handleVisitDate = this.handleVisitDate.bind(this); 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleVisitDate = this.handleVisitDate.bind(this);
         this.handlePay = this.handlePay.bind(this); 
         this.handleCardName = this.handleCardName.bind(this);
         this.handleCardNumber = this.handleCardNumber.bind(this); 
         this.handleExDate = this.handleExDate.bind(this);
         this.handleCvv = this.handleCvv.bind(this);
+    }
+
+    calculateDiscount() {
+        const newOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        }
+        if(this.state.visitDate !== null) { 
+            fetch('http://localhost:8080/account/profile', newOptions)
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ 
+                        visitorType: data.data.vtype, 
+                        numPurchased: data.data.mnumPurchased, 
+                        memberEndDate: data.data.mendDate, 
+                    }, () => {
+                        console.log("visitor type: " + this.state.visitorType); 
+                        console.log("number purchased: " + this.state.numPurchased); 
+                        console.log("member end date: " + this.state.memberEndDate); 
+                        fetch(`http://localhost:8080/account/getage`, newOptions)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.setState({ age: data.data}, () => {
+                                console.log("visitor age: " + this.state.age); 
+                                //default discount: 5%
+                                this.getTicketType();
+                                //weekends
+                                const date = new Date(this.state.visitDate)
+                                if (date.getDay() % 6 === 0) {
+                                    this.setState({
+                                        discount: 0
+                                    }, () => {
+                                        console.log("weekends discount: " + this.state.discount); 
+                                        this.addTicket(); 
+                                    }) 
+                                    return; 
+                                }
+                                //holidays
+                                const str = (date.getMonth()+1) + "-" + date.getDate()
+                                if (holidays.includes(str)) {
+                                    this.setState({
+                                        discount: 0
+                                    }, () => {
+                                        console.log("holidays discount: " + this.state.discount); 
+                                        this.addTicket(); 
+                                    }) 
+                                    return; 
+                                }
+
+                                this.typeDiscount();
+                            })
+                        }); 
+                    })
+                }); 
+        } 
+    }
+
+    getTicketType() {
+        if (this.state.age < 7) {
+            this.setState({
+                ticketType: 1
+            }, () => {
+                console.log("ticket type: " + this.state.ticketType)
+            }) 
+        } else if (this.state.age > 60) {
+            this.setState({
+                ticketType: 3
+            }, () => {
+                console.log("ticket type: " + this.state.ticketType)
+            }) 
+        } 
     } 
 
+    typeDiscount() { 
+        if (this.state.age < 7 || this.state.age > 60) {
+            this.setState({
+                discount: this.state.discount + 15
+            }, () => {
+                console.log("children or senior discount: " + this.state.discount); 
+                this.memberDiscount(); 
+            }) 
+        } else {
+            this.memberDiscount();
+        }
+    }
+
+    memberDiscount() {
+        //member discoutn: 10%
+        if (this.state.visitorType === 'M' && Date.parse(this.state.memberEndDate.substring(0, 10)) > Date.parse(this.state.visitDateStr) && this.state.numPurchased < 5) {
+            this.setState({
+                discount: this.state.discount + 10
+            }, () => {
+                console.log("member discount: " + this.state.discount); 
+                this.addTicket(); 
+            }) 
+        } else {
+            console.log("member end date: " + this.state.memberEndDate.substring(0, 10));
+            console.log("visit date: " + this.state.visitDateStr); 
+            console.log("validate: " + this.state.visitorType);
+            console.log("no member discount: " + this.state.discount); 
+            this.addTicket(); 
+        }
+    } 
+
+    addTicket() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        };
+        this.setState({
+            price: this.state.price * (1 - this.state.discount * 0.01)
+        }, () => {
+            fetch(`http://localhost:8080/ticket/add?tktOnline=1&tktVisitDate=${this.state.visitDateStr}&tktPrice=${this.state.price}&tktDiscount=${this.state.discount}&tktIspaid=0&tktTypeId=${this.state.ticketType}`, requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ ticketId: data }, () => {
+                    console.log("ticket id: " + this.state.ticketId); 
+                    const date = new Date(); 
+                    const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate()
+                    console.log("time: " + str)
+                    fetch(`http://localhost:8080/order/createorder?oDate=${str}&oQuantity=1&oAmount=${this.state.price}&vId=12&tktId=${this.state.ticketId}`, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.setState({ orderId: data.data }, () => {
+                            console.log("order id: " + this.state.orderId) 
+                        })
+                    });
+                });  
+            });
+        })
+
+    }
+
+    addPayment() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        };
+        const updateOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        };
+        if (this.state.addCard) {
+            console.log("try to add card"); 
+            const date = new Date(); 
+            const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+            fetch(`http://localhost:8080/payment/addcd?payTime=${str}&payAmount=${this.state.price}&payMethod=${'CD'}&cdName=${this.state.cardName}&cdNum=${this.state.cardNumber}&cdExDate=${this.state.expireDateStr}&cdCvv=${this.state.cvv}&cdCredit=${this.state.credit}`, requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("add payment successfully"); 
+                    this.setState({ paymentId: data }, () => {
+                        console.log("payment id: " + this.state.paymentId); 
+                        fetch(`http://localhost:8080/order/updatepayment?oId=${this.state.orderId}&payId=${this.state.paymentId}`, updateOptions)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("update order"); 
+                            fetch(`http://localhost:8080/ticket/payticket?tktId=${this.state.ticketId}`, updateOptions)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("update ticket"); 
+                                
+                            });
+                        });
+                    }) 
+
+                });
+        }
+    }
+
     //step 1
-    handleVisitDate = (date, dateString) => { 
+    handleVisitDate(date, dateString) { 
         this.setState ({
             visitDate: date,
             visitDateStr: dateString
-        })
-    }
-
-    handleCountChange(e) {
-        this.setState ({
-            count: e.target.value
-        })
-    } 
-    handleAccountChange (e) {
-        this.setState ({
-            otherAccount: e.target.value.trim()
-        })
-    }
-    handleAddAccount() { 
-        if (this.state.otherAccount === '') {
-            return; 
-        }
-        let include = this.state.addedAccount.includes(this.state.otherAccount)
-        if (include) {
-            //console.log("redundancy");
-            return; 
-        }
-        //verify the added account here: add only if the account exists
-        /**/ 
-        
-        const newAddedAccount = (this.state.addedAccount === null) ? [this.state.otherAccount] : [].concat(this.state.addedAccount, this.state.otherAccount);
-        //console.log("current added accounts: " + newAddedAccount + newAddedAccount.length);
-        this.setState ({
-            addedAccount: newAddedAccount
-        })
-    }
-
-    handleDeleteAccount(value) {
-        let afterDelete = this.state.addedAccount.slice(); 
-        for (let i = 0; i < afterDelete.length; i++) {
-            if (afterDelete[i] === value) {
-                afterDelete.splice(i, 1); 
-            }
-        }
-        this.setState ({
-            addedAccount: afterDelete
+        }, () => {
+            console.log(this.state.visitDate); 
+            console.log(this.state.visitDateStr);
         })
     }
 
     handleSubmit() {
         /* post data to backend ==> add ticket by account ==> unpaid*/ 
-        const val1 = this.state.count;
-        const val2 = (this.state.addedAccount === null) ? 0 : this.state.addedAccount.length;
         const now = new Date();
-        if (this.state.visitDate == null || this.state.visitDate < now) {
+        if (this.state.visitDate == null || this.state.visitDate < now) { 
             this.setState ({
                 alertMessage: "You should select a visit date from now on.", 
-                showAlert: true
-            }) 
-        } else if (val1 === 0 && val2 === 0) { 
-            this.setState ({
-                alertMessage: "You should select at least one ticket.", 
-                showAlert: true
-            })
-        } else if (val1 !== val2) {
-            //not match
-            this.setState ({
-                alertMessage: "You should add equivalent amount of accounts.", 
-                showAlert: true
+                showAlert: true, 
             })
         } else {
-            //transfer data
             this.setState ({
-                showAlert: false
+                showAlert: false, 
+                step: 1,  
             })
-            console.log('match');
-            this.setState ({
-                stepIndex: 1
-            }) 
-            console.log("added accounts: " + this.state.addedAccount)
-        }
+            this.calculateDiscount(); 
+        } 
     }  
 
     //step 2
@@ -158,7 +290,7 @@ export class BookDisplay extends React.Component {
         const now = new Date(); 
         if (this.state.cardName === '' || this.state.cardNumber === '' || this.state.cvv === '') {
             this.setState ({
-                alertMessage: "The card is invalid. Please check the card information.", 
+                alertMessage: "The card information cannot be null. Please check.", 
                 showAlert: true
             })
         } else if (this.state.exDate === null || this.state.exDate <= now) {
@@ -168,123 +300,79 @@ export class BookDisplay extends React.Component {
             })
         } else {
             this.setState ({
-                stepIndex: 2
+                step: 2, 
+                addCard: true
+            }, () => {
+                console.log("addCard: " + this.state.addCard); 
+                this.addPayment(); 
             })
         }
     }  
 
-    render() { 
-        const items = steps.map((item) => ({
-            key: item.title,
-            title: item.title,
-        }));
-        
-        return (
-            <div className='subbody'> 
-                <Steps current={this.state.stepIndex} items={items} 
-                    style = {{marginTop: 20}}/>
-                {this.state.stepIndex === 0 && (
-                <div className='bookBox'>
-                    <label style = {{color: '#0367D9', fontSize: 24, fontStyle: 'bold', marginTop: 20}}>
-                        Welcome to Wonderful Land!
-                    </label>
-                    <div style = {{display: 'flex', flexDirection: 'row'}}>
-                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 30}}>
-                            <div>
-                                <label> 
-                                    Which day would you like to visit? 
-                                </label>
-                            </div>
-                            <DatePicker 
-                                format='YYYY-MM-DD' 
-                                onChange={this.handleVisitDate}/> 
-                            {
-                                (this.state.showAlert) ? (
-                                    <Alert
-                                        message="Error"
-                                        description={this.state.alertMessage}
-                                        type="error"
-                                        showIcon 
-                                        style = {{width: 220, marginTop: 20}}
-                                    />
-                                ) : null
-                            }
-                        </div> 
-                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: 120}}>
-                            <div style = {{marginTop: 30}}>
-                                <label> Select the number of tickets: </label>
-                            </div>
-                            <Radio.Group onChange={this.handleCountChange}>
-                                <Radio value={1}>1</Radio>
-                                <Radio value={2}>2</Radio>
-                                <Radio value={3}>3</Radio>
-                                <Radio value={4}>4</Radio>
-                                <Radio value={5}>5</Radio>
-                            </Radio.Group>
-                            <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 30}}>
-                                <div>
-                                    <Input placeholder="other account" onChange = {this.handleAccountChange} style = {{width: 200}}/>
-                                    <Button onClick = {this.handleAddAccount} style = {{marginLeft: 10}}>Add</Button> 
-                                    <ul>
-                                        {
-                                            this.state.addedAccount.map(( account, index ) => (
-                                                <div style = {{display: 'flex', flexDirection: 'row', alignItems:'center'}}>
-                                                    <div key = {index} style = {{backgroundColor: '#F3F4F5', borderRadius: 5, width: 200, padding: 2, marginTop: 5}}>
-                                                        {account} 
-                                                    </div>
-                                                    <DeleteOutlined onClick = {() => this.handleDeleteAccount(account)}/>
-                                                </div>
-                                            ))
-                                        }
-                                    </ul>
-                                </div>
-                                <Button onClick = {this.handleSubmit}>Submit</Button> 
-                            </div>
-                        </div>
-                    </div>
+render() {
+    return (
+        <div className='subbody'> 
+            <Steps current={this.state.step} items={items} 
+                style = {{marginTop: 20}}/>
+            {this.state.step === 0 && (
+            <div className='bookBox'>
+                <h2 style = {{color: '#0367D9', fontSize: 24, fontStyle: 'bold', marginTop: 20}}>
+                    Welcome to Wonderful Land!
+                </h2>
+                <label style = {{fontSize: 20}}> 
+                    Which day would you like to visit? 
+                </label>
+                <DatePicker 
+                    format='YYYY-MM-DD' 
+                    onChange={this.handleVisitDate}
+                    style = {{marginTop: 20}}/> 
+                {
+                    (this.state.showAlert) ? (
+                        <Alert
+                            message="Error"
+                            description={this.state.alertMessage}
+                            type="error"
+                            showIcon 
+                            style = {{marginTop: 30}}
+                        />
+                    ) : null
+                }
+                <Button onClick = {this.handleSubmit} style={{marginTop: 30}}>Submit</Button>     
+            </div>)}
+
+            {this.state.step === 1 && (
+                <div className='bookBox'> 
                     
-                </div>)}
-
-                {this.state.stepIndex === 1 && (
-                    <div className='bookBox'> 
-                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                            <label style = {{marginTop: 20, fontSize: 20, fontStyle: 'bold'}}>Book Summary</label> 
-                            <div className='paySummary'>
-                                <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Price: {this.state.ticketPrice}</label>
-                                <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Quantity: {this.state.count}</label>
-                                <label style = {{marginLeft: 30, marginTop: 10}}>For accounts: </label> 
-                                {
-                                    this.state.addedAccount.map((account, index) => {
-                                        return <li key = {index} style = {{marginLeft: 40, marginTop: 8}}>{account}</li>
-                                    })
-                                }
-                                <label style = {{marginLeft: 30, marginTop: 10}}>Total Amount: </label> 
-                                 
-                            </div>
-                            <div className='addCard'>
-                                <div>
-                                    <label>Card Name: </label>
-                                    <Input placeholder="card name" onChange = {this.handleCardName} style = {{width: 200}}/>
-                                </div>
-                                <div>
-                                    <label style = {{marginTop: 10}}>Card Number: </label> 
-                                    <Input placeholder="card number" onChange = {this.handleCardNumber} style = {{width: 200}}/>
-                                </div>
-                                <div>
-                                    <label style = {{marginTop: 10}}>CVV: </label>
-                                    <Input placeholder="security code" onChange = {this.handleCvv} style = {{width: 200}}/>
-                                </div>
-                                <div>
-                                    <label style = {{marginTop: 10}}>Expiration Date: </label>
-                                    <DatePicker 
-                                        format='YYYY-MM-DD' 
-                                        onChange={this.handleExDate}/> 
-                                </div> 
-
-
-                            </div>
+                        <label style = {{marginTop: 20, fontSize: 20, fontStyle: 'bold'}}>Book Summary</label> 
+                        <div className='paySummary'>
+                            <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Price: ${this.state.price}</label>
+                            <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Type: {ticketTypes[this.state.ticketType]}</label>
+                            <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Discount: {this.state.discount}%</label>
+                            <label style = {{marginLeft: 30, marginTop: 10}}>Total Amount: ${this.state.price}</label> 
                         </div>
-                        <Button onClick = {this.handlePay} style = {{marginTop: 30}}>Pay</Button> 
+                        <Form labelCol={{
+                                span: 9,
+                              }}
+                              wrapperCol={{
+                                span: 24,
+                              }}
+                              layout="horizontal" 
+                              style = {{marginTop: 30}}>
+                            <Form.Item label="Card Name">
+                                <Input placeholder="card name" onChange = {this.handleCardName}/>
+                            </Form.Item>
+                            <Form.Item label="Card Number">
+                                <Input placeholder="card number" onChange = {this.handleCardNumber}/>
+                            </Form.Item>
+                            <Form.Item label="Expire Date">
+                                <DatePicker 
+                                    format='YYYY-MM-DD' 
+                                    onChange={this.handleExDate}/>
+                            </Form.Item> 
+                            <Form.Item label="CVV">
+                                <Input placeholder="security code" onChange = {this.handleCvv}/>
+                            </Form.Item>
+                        </Form> 
                         {
                             (this.state.showAlert) ? (
                                 <Alert
@@ -292,30 +380,59 @@ export class BookDisplay extends React.Component {
                                     description={this.state.alertMessage}
                                     type="error"
                                     showIcon 
-                                    style = {{width: 250, marginTop: 20}}
+                                    style = {{marginTop: 30}}
                                 />
                             ) : null
                         }
-                    </div>)}
-                
-                {this.state.stepIndex === 2 && (
-                    <div className='bookBox'>
-                        <Result
-                            status="success"
-                            title="Successfully Purchased Ticket(s)!"
-                            extra={[
-                                <Link to = '/'>
-                                    <Button>
-                                        Go to Home
-                                    </Button>
-                                </Link>
-                            ]}
-                        />
-                    </div>)}
+                        <Button onClick = {this.handlePay} style={{marginTop: 30}}>Pay</Button>   
+                        
+                </div>)}
+            
+            {this.state.step === 2 && (
+                <div className='bookBox'>
+                    <Result
+                        status="success"
+                        title="Successfully Purchased Ticket(s)!"
+                        extra={[
+                            <Link to = '/'>
+                                <Button>
+                                    Go to Home
+                                </Button>
+                            </Link>
+                        ]}
+                    />
+                </div>)}
 
-            </div>
-        )
+        </div>
+    )
+                    }
+} 
+
+class AddTicket extends React.Component {
+    //visitDate = this.props.addTicketProps;
+    visitDateStr = this.props.addTicketProps; 
+    state = {
+        ticketId: 0, 
     }
-    
-}
 
+    componentDidMount() {
+        // Simple POST request with a JSON body using fetch
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        };
+        fetch(`http://localhost:8080/ticket/add?tktOnline=1&tktVisitDate=${this.visitDateStr}&tktPrice=80&tktDiscount=12&tktIspaid=0&tktTypeId=2`, requestOptions)
+            .then(response => response.json())
+            .then(data => this.setState({ ticketId: data }));
+    }
+
+    render() {
+        console.log("add ticket render")
+        const { ticketId } = this.state;
+        return (
+            <div>
+                Returned Id: {ticketId}
+            </div>
+        );
+    }
+} 

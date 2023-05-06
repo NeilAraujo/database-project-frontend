@@ -34,7 +34,9 @@ export function AttractionDisplay() {
       fetch('http://localhost:8080/attraction/listatttype') 
       .then((response) => response.json()) 
       .then((data) => {
+          console.log("attractions: " + data.data); 
           setTypeData(data.data); 
+          console.log("attractions: " + typeData); 
       })
     }, []);
 

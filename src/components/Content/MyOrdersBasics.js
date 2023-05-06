@@ -43,13 +43,13 @@ function Order({orderData}) {
             {
                 orderData.map( order => {
                     let typeid = 0;
-                    if (order.tkt_id !== 0) {
+                    if (order.tkt_id !== null) {
                         typeid = 1; 
-                    } else if (order.st_id !== 0) {
+                    } else if (order.st_id !== null) {
                         typeid = 2;
-                    } else if (order.sh_id !== 0) {
+                    } else if (order.sh_id !== null) {
                         typeid = 3;
-                    } else if (order.park_id !== 0) {
+                    } else if (order.park_id !== null) {
                         typeid = 4;
                     }
                 
@@ -101,7 +101,7 @@ function Order({orderData}) {
 function GetPayment({o_id}) {
     const [payment, setPayment] = useState([]); 
     useEffect(() => {
-        fetch(`http://localhost:8080/payment/get?oId=${o_id}`) 
+        fetch(`http://localhost:8080/payment/getbyorder?oId=${o_id}`) 
         .then((response) => response.json()) 
         .then((data) => {
             setPayment(data.data); 

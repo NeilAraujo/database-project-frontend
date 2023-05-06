@@ -613,9 +613,6 @@ function ShowAllOrders({orderData}) {
             title: 'Date', 
             dataIndex: 'o_date', 
             key: 'o_date',
-            render : (_, {o_date}) => {
-                return <label>{o_date.substring(0, 10)}</label>
-            }
         }, {
             title: 'Quantity', 
             dataIndex: 'o_quantity', 
@@ -633,7 +630,7 @@ function ShowAllOrders({orderData}) {
             dataIndex: 'pay_id', 
             key: 'pay_id', 
             render: (_, {pay_id}) => {
-                if (pay_id === 0) {
+                if (pay_id === null) {
                     return <label>unpaid</label>
                 } else {
                     return <label>{pay_id}</label>
@@ -644,7 +641,7 @@ function ShowAllOrders({orderData}) {
             dataIndex: 'sh_id', 
             key: 'sh_id', 
             render: (_, {sh_id}) => {
-                if (sh_id === 0) {
+                if (sh_id === null) {
                     return <label>none</label>
                 } else {
                     return <label>{sh_id}</label>
@@ -655,7 +652,7 @@ function ShowAllOrders({orderData}) {
             dataIndex: 'st_id', 
             key: 'st_id', 
             render: (_, {st_id}) => {
-                if (st_id === 0) {
+                if (st_id === null) {
                     return <label>none</label>
                 } else {
                     return <label>{st_id}</label>
@@ -666,7 +663,7 @@ function ShowAllOrders({orderData}) {
             dataIndex: 'mi_id', 
             key: 'mi_id', 
             render: (_, {mi_id}) => {
-                if (mi_id === 0) {
+                if (mi_id === null) {
                     return <label>none</label>
                 } else {
                     return <label>{mi_id}</label>
@@ -677,7 +674,7 @@ function ShowAllOrders({orderData}) {
             dataIndex: 'park_id', 
             key: 'park_id', 
             render: (_, {park_id}) => {
-                if (park_id === 0) {
+                if (park_id === null) {
                     return <label>none</label>
                 } else {
                     return <label>{park_id}</label>
@@ -688,7 +685,7 @@ function ShowAllOrders({orderData}) {
             dataIndex: 'tkt_id', 
             key: 'tkt_id', 
             render: (_, {tkt_id}) => {
-                if (tkt_id === 0) {
+                if (tkt_id === null) {
                     return <label>none</label>
                 } else {
                     return <label>{tkt_id}</label>
