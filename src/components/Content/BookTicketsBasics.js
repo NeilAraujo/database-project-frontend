@@ -402,7 +402,7 @@ render() {
                             <Form.Item label="CVV">
                                 <Input placeholder="security code" onChange = {this.handleCvv}/>
                             </Form.Item>
-                            <Form.Item label="Radio">
+                            <Form.Item label="Credit">
                                 <Radio.Group onChange={this.handleCredit}>
                                     <Radio value="1"> Credit </Radio>
                                     <Radio value="0"> Debit </Radio>

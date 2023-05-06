@@ -22,6 +22,8 @@ export function OrderDisplay() {
 const allOptions = [{id: 0, type: 'All'}, {id: 1, type: 'Ticket'}, {id: 2, type: 'Store'}, 
     {id: 3, type: 'Show'}, {id: 4, type: 'Parking'}]; 
 
+const ticketTypes = ['', 'child', 'adult', 'senior']; 
+
 function Order({orderData}) {
     const [selectedOption, setSelectedOption] = useState(0); 
     
@@ -59,7 +61,7 @@ function Order({orderData}) {
                                 <div className='orderContainer1'> 
                                     <div>
                                         <label style ={{color: '#868989', fontSize: 14, marginLeft: 20}}>Order placed on</label> 
-                                        <label style ={{color: '#7A7D7D', fontSize: 16, marginLeft: 20}}>{order.o_date}</label>
+                                        <label style ={{color: '#7A7D7D', fontSize: 16, marginLeft: 20}}>{order.o_date.substring(0, 10)}</label>
                                     </div> 
                                     <div style={{position: 'absolute', right: 20}}> 
                                         <label style ={{color: '#868989', fontSize: 14, marginLeft: 20}}>Order #{order.o_id}</label> 
@@ -70,9 +72,20 @@ function Order({orderData}) {
                                         <img className='orderImage' src = {require(`./images/order/${typeid}.jpg`)}></img>
                                     </div>
                                     <div style=
-                                        {{display: 'flex', flexDirection: 'column', marginLeft: 40, alignItems: 'center'}}>
+                                        {{display: 'flex', flexDirection: 'column', width: 600, marginLeft: 40, alignItems: 'center'}}>
                                         <label style={{marginTop: 5, fontSize: 22, color: '#1C468E', fontWeight: 'bold'}}>{allOptions[typeid].type} Order</label>
-                                        <label style={{marginTop: 20, marginBottom: 10, fontSize: 16}}>Here is a long description for the ordered item</label>
+                                        {
+                                            typeid === 1 && <GetTicketDescription tkt_id={order.tkt_id} />
+                                        }
+                                        {
+                                            typeid === 2 && <GetStoreDescription st_id={order.st_id} mi_id={order.mi_id} />
+                                        }
+                                        {
+                                            typeid === 3 && <GetShowDescription sh_id={order.sh_id} />
+                                        }
+                                        {
+                                            typeid === 4 && <GetParkDescription park_id={order.park_id} />
+                                        }
                                         <ViewDetail index = {typeid}/>
                                     </div>
                                     <div style=
@@ -96,6 +109,139 @@ function Order({orderData}) {
             </div>
         </div>
     )
+}
+
+function GetTicketDescription({tkt_id}){ 
+    const [ticketType, setTicketType] = useState(2); 
+    const [discount, setDiscount] = useState(0); 
+    
+    useEffect(() => {
+        fetch(`http://localhost:8080/ticket/get?tktId=${tkt_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setTicketType(data.data.tkttype_id); 
+            setDiscount(data.data.tkt_discount);
+        })
+    } ,[]); 
+
+    return <label style={{marginTop: 10, marginBottom: 10, fontSize: 18}}>{ticketTypes[ticketType]} ticket with {discount}% discount</label>
+}
+
+function GetStoreDescription({st_id, mi_id}) { 
+    const [menuItems, setMenuItems] = useState([]); 
+    const [item, setItem] = useState('');
+    const [store, setStore] = useState(''); 
+
+    useEffect(() => {
+        getMenu(); 
+        getStore(); 
+    } ,[]); 
+
+    useEffect(() => {
+        console.log(menuItems);
+    }, [menuItems]);
+
+    useEffect(() => {
+        console.log(store); 
+    }, [store]);
+
+    useEffect(() => {
+        console.log(item); 
+    }, [item]);
+
+    function getMenu() {
+        fetch(`http://localhost:8080/store/listmi`) 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setMenuItems(data.data); 
+            setItem(data.data[mi_id - 1].mi_name); 
+        })
+    }
+
+    function getStore() {
+        fetch(`http://localhost:8080/store/get?stId=${st_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setStore(data.data.st_name); 
+        })
+    }
+    
+
+    return <labeL style={{marginTop: 10, marginBottom: 10, fontSize: 18}}>{item} in {store}</labeL>
+}
+
+function GetShowDescription({sh_id}) {
+    const [showName, setShowName] = useState(''); 
+    const [description, setDescription] = useState(''); 
+    useEffect(() => {
+        getShow();
+    } ,[]);
+    
+    useEffect(() => {
+        console.log(showName); 
+    } ,[showName]); 
+
+    useEffect(() => {
+        console.log(description); 
+    } ,[description]); 
+
+    function getShow() {
+        fetch(`http://localhost:8080/show/get?shId=${sh_id}`) 
+        .then((response) => response.json()) 
+        .then((data) => {
+            setShowName(data.data.sh_name); 
+            setDescription(data.data.sh_description); 
+        })
+    }
+
+    return <label style={{marginTop: 10, marginBottom: 10, fontSize: 18}}>{showName}: {description}</label>
+} 
+
+function GetParkDescription({park_id}) {
+    const [parkLots, setParkLots] = useState([]); 
+    //const [lotId, setLotId] = useState(0); 
+    const [lotName, setLotName] = useState('');
+    const [timeIn, setTimeIn] = useState(''); 
+    const [timeOut, setTimeOut] = useState(''); 
+    
+    useEffect(() => {
+        getParking(); 
+    } ,[]); 
+
+    useEffect(() => {
+        console.log("parkLots: " + parkLots); 
+    }, [parkLots]);
+
+    useEffect(() => {
+        console.log(timeIn); 
+    }, [timeIn]);
+
+    useEffect(() => {
+        console.log(timeOut); 
+    }, [timeOut]); 
+
+    useEffect(() => {
+        console.log(lotName); 
+    }, [lotName]); 
+
+
+    function getParking() {
+        fetch(`http://localhost:8080/parking/get?parkId=${park_id}`) 
+            .then((response) => response.json()) 
+            .then((data1) => {
+                //setLotId(data1.data.pl_id);
+                setTimeIn(data1.data.park_time_in); 
+                setTimeOut(data1.data.park_time_out); 
+                fetch(`http://localhost:8080/parking/listpl`) 
+                .then((response) => response.json()) 
+                .then((data2) => {
+                    setParkLots(data2.data); 
+                    setLotName(data2.data[data1.data.pl_id - 1].pl_name)
+                }) 
+            }) 
+    }
+
+    return <label style={{marginTop: 10, marginBottom: 10, fontSize: 18}}>{lotName}: {timeIn} - {timeOut}</label>
 }
 
 function GetPayment({o_id}) {
