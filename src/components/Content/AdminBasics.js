@@ -249,9 +249,9 @@ class AddShow extends React.Component {
                     <TimePicker onChange = {this.handleEndTime}/>
                 </Form.Item> 
                 <Form.Item label="Wheelchair Accessible">
-                    <Radio.Group onChange={this.handleWheelchairAcc} defaultValue={"1.0"}>
-                        <Radio value="1.0"> Yes </Radio>
-                        <Radio value="0.0"> No </Radio>
+                    <Radio.Group onChange={this.handleWheelchairAcc} defaultValue={"1"}>
+                        <Radio value="1"> Yes </Radio>
+                        <Radio value="0"> No </Radio>
                     </Radio.Group>
                 </Form.Item>
                 <Form.Item label="Show Price">

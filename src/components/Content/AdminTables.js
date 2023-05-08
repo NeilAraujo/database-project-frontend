@@ -117,7 +117,7 @@ function ShowAllTickets ({typeData, ticketData}) {
             dataIndex: 'tkt_online', 
             key: 'tkt_online', 
             render: (_, {tkt_online}) => {
-                if (tkt_online === '1.0') {
+                if (tkt_online === '1') {
                     return <label>online</label>
                 } else {
                     return <label>onsite</label>
@@ -143,6 +143,17 @@ function ShowAllTickets ({typeData, ticketData}) {
             key: 'tkt_discount', 
             render: (_, {tkt_discount}) => {
                 return <label>{tkt_discount}%</label>
+            }
+        }, {
+            title: 'Ispaid', 
+            dataIndex: 'tkt_ispaid', 
+            key: 'tkt_ispaid', 
+            render: (_, {tkt_ispaid}) => { 
+                if (tkt_ispaid === '1') {
+                    return <label>Paid</label>
+                } else {
+                    return <label>Unpaid</label>
+                }
             }
         }, 
     ];
@@ -223,7 +234,7 @@ function ShowAllShows ({ typeData, showData }) {
             dataIndex: 'sh_wheelchair_acc', 
             key: 'sh_wheelchair_acc', 
             render: (_, {sh_wheelchair_acc}) => { 
-                if (sh_wheelchair_acc === '1.0') {
+                if (sh_wheelchair_acc === '1') {
                     return <label>Allowed</label>
                 } else {
                     return <label>Not Allowed</label>
@@ -654,20 +665,32 @@ function GetPayment({pay_id}) {
         axios.get(`http://localhost:8080/payment/get?payId=${pay_id}`) 
         .then((response) => response.data) 
         .then((data) => { 
-            setPayment(data.data); 
+           setPayment(data.data); 
+       // }, () => {
+            console.log("payment method: " + data.data.pay_method); 
+            if(data.data.pay_method === 'CD') {
+                axios.get(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
+                .then((response) => response.data) 
+                .then((data) => { 
+                    setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
+                    setCardCredit(data.data.cd_credit === '1'); 
+                    console.log("payment: " + pay_id + " credit?: " + data.data.cd_credit)
+                })
+            }
         })
     }, []); 
 
-    useEffect(() => { 
-        if(payment.pay_method === 'CD') {
-            axios.get(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
-            .then((response) => response.data) 
-            .then((data) => { 
-                setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
-                setCardCredit((data.data.cd_credit === '1.0' ? true : false)); 
-            })
-        }
-    }, []); 
+    // useEffect(() => { 
+    //     if(payment.pay_method === 'CD') {
+    //         axios.get(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
+    //         .then((response) => response.data) 
+    //         .then((data) => { 
+    //             setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
+    //             setCardCredit(data.data.cd_credit === '1'); 
+    //             console.log("payment: " + pay_id + " credit?: " + data.data.cd_credit)
+    //         })
+    //     }
+    // }, []); 
 
     return payment.pay_method === 'CA' ? <label>Cash</label> : (cardCredit? <label>Credit Card: ****{cardNumber}</label> : <label>Debit Card: ****{cardNumber}</label>)
 
