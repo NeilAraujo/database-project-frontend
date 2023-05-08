@@ -343,6 +343,11 @@ const CustSignUp = () => {
                 Have an Account?
             </div>
                 <Link to="/custlogin">Login</Link>
+
+            <div style={{fontSize:12,color:'black',fontFamily:'sans-serif',fontWeight:'initial',marginTop:10}}>
+                Employee Login
+            </div>
+                <Link to="/emplogin">Login</Link>
           
         </div>
     );

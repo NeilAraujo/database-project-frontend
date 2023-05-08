@@ -8,6 +8,7 @@ const CustLogin = () => {
     const [password, onChangePassword] = useState('');
     const myContext = useContext(AppContext);
     const [loginerror,setLoginError] = useState(false)
+    const [adminerror,setAdminError] = useState(false)
 
     const HandleLogin = () => {
         const requestOptions = {
@@ -16,29 +17,29 @@ const CustLogin = () => {
             body: JSON.stringify({ 
                 accEmail: email,
                 accPwd: password
-            })
+            }),
+            credentials:'include'
         };
         fetch('http://localhost:8080/account/login', requestOptions)
             .then(response => response.json())
             .then(data => { 
                 console.log(data)
                 if(data.success === true){
-                    fetch('http://localhost:8080/account/getrole')
+                    fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
                     .then(response=>response.json())
                     .then(data=> {
-                        console.log(data)
+                        if(data.data==="admin"){
+                            setAdminError(true)
+                        }else{
+                            setLoginError(false)
+                            setAdminError(false)
+                            myContext.setLogin(true)
+                        }
                     })
-                    setLoginError(false)
-                    // myContext.setLogin(true)
                 }else{
                     setLoginError(true)
                 }
             });
-        // fetch('http://localhost:8080/account/getrole')
-        //     .then(response=>response.json())
-        //     .then(data=> {
-        //         console.log(data)
-        //     })
     }
 
     return (
@@ -78,6 +79,11 @@ const CustLogin = () => {
                  <div style={{fontSize:15,color:'red',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'center',marginBottom:10}}>Incorrect Email or Password</div>
             }
 
+            {
+                adminerror && 
+                <div style={{fontSize:15,color:'red',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'center',marginBottom:10}}>Please use the Admin Login</div>
+            }
+
 
            
            <button onClick={()=>HandleLogin()} style={{width:'30%',height:40,borderRadius:20,backgroundColor:'black',color:'white',fontFamily:16,marginTop:15}}>Login</button>
@@ -90,13 +96,13 @@ const CustLogin = () => {
                 <Link to="/custsignup">SignUp</Link>
         
 
-            {/* <div style={{fontSize:12,color:'black',fontFamily:'sans-serif',fontWeight:'initial',marginTop:10, marginRight: 1}}>
+            <div style={{fontSize:12,color:'black',fontFamily:'sans-serif',fontWeight:'initial',marginTop:10, marginRight: 1}}>
                 Employee Login
             </div>
                     <Link to="/emplogin">
                         Login
                     </Link>
-                  */}
+                 
            
         </div>
     );

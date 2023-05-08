@@ -26,16 +26,15 @@ function App() {
     setLogin
   };
 
-  // useEffect(()=>{ 
-  //   fetch('http://localhost:8080/account/getrole')
-  //   .then(response=>response.json())
-  //   .then(data=> {
-  //       console.log(data)
-  //       if(data.data === "admin"){
-  //           setAdmin(true) 
-  //       }
-  //   })
-  // },[login])
+  useEffect(()=>{ 
+    fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
+    .then(response=>response.json())
+    .then(data=> {
+        if(data.data === "admin"){
+            setAdmin(true) 
+        }
+    })
+  },[login])
 
   return ( 
   <AppContext.Provider value={userSettings}>
@@ -84,7 +83,7 @@ function App() {
           <Navbar admin={admin}/>
           <div> 
           <Routes>
-              <Route path="/custlogin" element={<Navigate to ="/admin" />}/>
+              <Route path="/emplogin" element={<Navigate to ="/admin" />}/>
               <Route exact path="/admin" element={<AdminProfile/>} />
           </Routes>
         </div>

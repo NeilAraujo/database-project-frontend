@@ -16,7 +16,8 @@ const EmpLogin = () => {
             body: JSON.stringify({ 
                 accEmail: email,
                 accPwd: password
-            })
+            }),
+            credentials:'include'
         };
         console.log(requestOptions.body)
         fetch('http://localhost:8080/account/login', requestOptions)
@@ -26,10 +27,12 @@ const EmpLogin = () => {
                     setLoginError(true)
                 }else{
                     setLoginError(false)
-                    fetch('http://localhost:8080/account/getrole')
+                    fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
                     .then(response=>response.json())
                     .then(data=> {
                         if(data.data === "admin"){
+                            setAdminError(false)
+                            setLoginError(false)
                             myContext.setLogin(true)
                         }else{
                             setAdminError(true)
