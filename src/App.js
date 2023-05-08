@@ -57,7 +57,7 @@ function App() {
 
         {/* <Navigate to="/custlogin"/> */}
 
-        {localStorage.getItem("Login")==="false" && 
+        {((localStorage.getItem("Login")===null) || (localStorage.getItem("Login")==="false")) && 
         <div>
          <Routes>
               <Route path="/" element={<Navigate to ="/custlogin" />}/>
