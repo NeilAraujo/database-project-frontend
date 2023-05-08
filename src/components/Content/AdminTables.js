@@ -2,34 +2,17 @@ import React  from 'react';
 import { useState, useEffect } from 'react'; 
 import { Tag, Table } from 'antd'; 
 
-import styled from 'styled-components'; 
 import './Admin.css'; 
+import axios from 'axios';
 
 const { Column, ColumnGroup } = Table;
-
-const Tab = styled.button`
-  font-size: 16px;
-  font-style: bold;
-  padding: 1% 3%;
-  cursor: pointer;
-  opacity: 0.6;
-  background: white;
-  border: 0;
-  outline: 0;
-  ${({ active }) =>
-    active &&
-    `
-    border-bottom: 2px solid black;
-    opacity: 1;
-  `}
-`;
 
 export function AllVisitors() { 
     const [visitorData, setVisitorData] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/visitor/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/visitor/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setVisitorData(data.data); 
         })
@@ -88,16 +71,16 @@ export function AllTickets() {
     const [ticketData, setTicketData] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/ticket/listtkttype') 
-        .then((response) => response.json()) 
-        .then((data) => {
+        axios.get('http://localhost:8080/ticket/listtkttype') 
+        .then((response) => response.data) 
+        .then((data) => { 
             setTypeData(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/ticket/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/ticket/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setTicketData(data.data); 
         })
@@ -172,16 +155,16 @@ export function AllShows() {
     const [showData, setShowData] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/show/listshtype') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/show/listshtype') 
+        .then((response) => response.data) 
         .then((data) => {
             setTypeData(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/show/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/show/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setShowData(data.data); 
         })
@@ -265,24 +248,24 @@ export function AllAttractions() {
     const [attraction, setAttraction] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/attraction/listatttype') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/attraction/listatttype') 
+        .then((response) => response.data) 
         .then((data) => {
             setTypeData(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/attraction/listls') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/attraction/listls') 
+        .then((response) => response.data) 
         .then((data) => {
             setLocation(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/attraction/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/attraction/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setAttraction(data.data); 
         })
@@ -374,16 +357,16 @@ export function AllStores() {
     const [storeData, setStoreData] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/store/listctg') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/store/listctg') 
+        .then((response) => response.data) 
         .then((data) => {
             setCategory(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/store/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/store/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setStoreData(data.data); 
         })
@@ -438,11 +421,10 @@ function ShowAllStores({category, storeData}) {
 function GetMenu({st_id}) {
     const [menuItems, setMenuItems] = useState([]); 
     useEffect(() => {
-        fetch(`http://localhost:8080/store/getmi?stId=${st_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/store/getmi?stId=${st_id}`) 
+        .then((response) => response.data) 
         .then((data) => { 
             setMenuItems(data.data); 
-            console.log("menu items: " + menuItems); 
         })
     }, []); 
 
@@ -462,16 +444,16 @@ export function AllParkings() {
     const [parking, setParking] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/parking/listpl') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/parking/listpl') 
+        .then((response) => response.data) 
         .then((data) => {
             setParkLot(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/parking/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/parking/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setParking(data.data); 
         })
@@ -533,8 +515,8 @@ export function AllOrders() {
     const [orderData, setOrderData] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/order/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/order/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setOrderData(data.data); 
         })
@@ -669,20 +651,22 @@ function GetPayment({pay_id}) {
     const [cardCredit, setCardCredit] = useState(false); 
 
     useEffect(() => {
-        fetch(`http://localhost:8080/payment/get?payId=${pay_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/payment/get?payId=${pay_id}`) 
+        .then((response) => response.data) 
         .then((data) => { 
             setPayment(data.data); 
         })
     }, []); 
 
-    useEffect(() => {
-        fetch(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
-        .then((response) => response.json()) 
-        .then((data) => { 
-            setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
-            setCardCredit((data.data.cd_credit === '1.0' ? true : false)); 
-        })
+    useEffect(() => { 
+        if(payment.pay_method === 'CD') {
+            axios.get(`http://localhost:8080/payment/getcd?payId=${pay_id}`) 
+            .then((response) => response.data) 
+            .then((data) => { 
+                setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
+                setCardCredit((data.data.cd_credit === '1.0' ? true : false)); 
+            })
+        }
     }, []); 
 
     return payment.pay_method === 'CA' ? <label>Cash</label> : (cardCredit? <label>Credit Card: ****{cardNumber}</label> : <label>Debit Card: ****{cardNumber}</label>)
@@ -693,8 +677,8 @@ function GetPaymentTime({ pay_id }) {
     const [payTime, setPayTime] = useState(''); 
 
     useEffect(() => {
-        fetch(`http://localhost:8080/payment/get?payId=${pay_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/payment/get?payId=${pay_id}`) 
+        .then((response) => response.data) 
         .then((data) => { 
             setPayTime(data.data.pay_time); 
         })

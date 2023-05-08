@@ -1,29 +1,12 @@
 import React from 'react';
-import styled from 'styled-components'; 
 import { useState, useEffect } from 'react'; 
 
 import './Attractions.css'; 
+import axios from 'axios'; 
 
-const Tab = styled.button`
-  font-size: 18px;
-  font-style: bold;
-  padding: 2% 6%;
-  cursor: pointer;
-  opacity: 0.6;
-  background: white;
-  border: 0;
-  outline: 0;
-  ${({ active }) =>
-    active &&
-    `
-    border-bottom: 2px solid #1C468E;
-    opacity: 1;
-  `}
-`;
+//axios.defaults.withCredentials = true; 
 
-const ButtonGroup = styled.div`
-  display: flex;
-`;
+const headers = { 'Content-Type': 'application/json', credentials: 'include'}
 
 export function AttractionDisplay() { 
     const [typeData, setTypeData] = useState([]); 
@@ -31,65 +14,29 @@ export function AttractionDisplay() {
     const [location, setLocation] = useState([]); 
   
     useEffect(() => {
-      fetch('http://localhost:8080/attraction/listatttype') 
-      .then((response) => response.json()) 
+      axios.get('http://localhost:8080/attraction/listatttype')
+      .then((response) => response.data) 
       .then((data) => {
           setTypeData(data.data); 
       })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/attraction/list') 
-        .then((response) => response.json()) 
-        .then((data) => {
-            setAttraction(data.data); 
-        })
-    }, []); 
+      axios.get('http://localhost:8080/attraction/list')
+      .then((response) => response.data) 
+      .then((data) => {
+          setAttraction(data.data); 
+      })
+    }, [])
 
     useEffect(() => {
-      fetch('http://localhost:8080/attraction/listls') 
-      .then((response) => response.json()) 
+      axios.get('http://localhost:8080/attraction/listls') 
+      .then((response) => response.data) 
       .then((data) => {
           setLocation(data.data); 
       })
-    }, []);
-
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-      body: JSON.stringify({
-        accEmail: 'qz@gmail.com', 
-        accPwd: 'qz@gmail.com'
-      })
-    }; 
-
-    useEffect(() => {
-      fetch('http://localhost:8080/account/login', requestOptions) 
-      .then((response) => {
-        response.json().then((data) => {
-          console.log("login: " + data.message) 
-          //sessionStorage.setItem('userInfo', data.data)
-          if (data.success === true) {
-            console.log("role: " + data.data);
-            fetch('http://localhost:8080/account/getrole') 
-            .then((response) => response.json()) 
-            .then((data) => {
-              console.log("role: " + data.data);
-            })
-          }
-        })
-      }) 
-  }, []); 
-
-//   useEffect(() => {
-//     fetch('http://localhost:8080/account/getrole') 
-//     .then((response) => response.json()) 
-//     .then((data) => {
-//       console.log("get role: " + data.message) 
-//     })
-// }, []); 
-
-
+    }, [])
+    
     return (
       <div>
           <TabGroup typeData={typeData} attraction={attraction} location={location}/>
@@ -111,18 +58,17 @@ function TabGroup({typeData, attraction, location}) {
 
     return (
       <div className='tabGroupBox'>
-        <ButtonGroup>
+        <div style={{displya: 'flex'}}>
           {typeData.map((type, index) => (
-            <Tab
+            <button
               key={index}
-              active={activeType === type.atttype_id}
               onClick={() => setActiveType(type.atttype_id)} 
               style = {{fontSize: 22, fontStyle: 'bold', color: '#253A56'}}
             >
               {type.atttype_name}
-            </Tab>
+            </button>
           ))}
-        </ButtonGroup>
+        </div>
         <div className='tabContentBox'>
           <ul>
             {

@@ -1,12 +1,25 @@
 .itemImage1 {
     width: 80%;
-    padding-left: 10%;
-    padding-right: 10%;
+    margin-left: 10%;
+    margin-right: 10%;
     border-radius: 10px;
 }
 
 .itemImage2 {
-    width: 25%;
+    width: 60%;
     border-style: none;
-    border-radius: 10%;
+    border-radius: 10px;
+}
+
+.itemImage3 {
+    width: 30%;
+    border-style: none;
+    border-radius: 10px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    width: 100%; 
 }

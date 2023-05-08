@@ -3,20 +3,20 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react'; 
 import { Button } from 'antd';
 import './MyOrders.css';
+import axios from 'axios'; 
 
 export function OrderDisplay() { 
     const [orderData, setOrderData] = useState([]); 
     
     useEffect(() => {
-        fetch('http://localhost:8080/order/visitlist') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/order/visitlist') 
+        .then((response) => response.data) 
         .then((data) => {
             setOrderData(data.data); 
         })
     }, [])
     
     return <Order orderData={orderData} />
-    
 } 
 
 const allOptions = [{id: 0, type: 'All'}, {id: 1, type: 'Ticket'}, {id: 2, type: 'Store'}, 
@@ -116,8 +116,8 @@ function GetTicketDescription({tkt_id}){
     const [discount, setDiscount] = useState(0); 
     
     useEffect(() => {
-        fetch(`http://localhost:8080/ticket/get?tktId=${tkt_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/ticket/get?tktId=${tkt_id}`) 
+        .then((response) => response.data) 
         .then((data) => {
             setTicketType(data.data.tkttype_id); 
             setDiscount(data.data.tkt_discount);
@@ -150,8 +150,8 @@ function GetStoreDescription({st_id, mi_id}) {
     }, [item]);
 
     function getMenu() {
-        fetch(`http://localhost:8080/store/listmi`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/store/listmi`) 
+        .then((response) => response.data) 
         .then((data) => {
             setMenuItems(data.data); 
             setItem(data.data[mi_id - 1].mi_name); 
@@ -159,14 +159,12 @@ function GetStoreDescription({st_id, mi_id}) {
     }
 
     function getStore() {
-        fetch(`http://localhost:8080/store/get?stId=${st_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/store/get?stId=${st_id}`) 
+        .then((response) => response.data) 
         .then((data) => {
             setStore(data.data.st_name); 
         })
     }
-    
-
     return <labeL style={{marginTop: 10, marginBottom: 10, fontSize: 18}}>{item} in {store}</labeL>
 }
 
@@ -186,8 +184,8 @@ function GetShowDescription({sh_id}) {
     } ,[description]); 
 
     function getShow() {
-        fetch(`http://localhost:8080/show/get?shId=${sh_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/show/get?shId=${sh_id}`) 
+        .then((response) => response.data) 
         .then((data) => {
             setShowName(data.data.sh_name); 
             setDescription(data.data.sh_description); 
@@ -226,14 +224,14 @@ function GetParkDescription({park_id}) {
 
 
     function getParking() {
-        fetch(`http://localhost:8080/parking/get?parkId=${park_id}`) 
-            .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/parking/get?parkId=${park_id}`) 
+            .then((response) => response.data) 
             .then((data1) => {
                 //setLotId(data1.data.pl_id);
                 setTimeIn(data1.data.park_time_in); 
                 setTimeOut(data1.data.park_time_out); 
-                fetch(`http://localhost:8080/parking/listpl`) 
-                .then((response) => response.json()) 
+                axios.get(`http://localhost:8080/parking/listpl`) 
+                .then((response) => response.data) 
                 .then((data2) => {
                     setParkLots(data2.data); 
                     setLotName(data2.data[data1.data.pl_id - 1].pl_name)
@@ -247,8 +245,8 @@ function GetParkDescription({park_id}) {
 function GetPayment({o_id}) {
     const [payment, setPayment] = useState([]); 
     useEffect(() => {
-        fetch(`http://localhost:8080/payment/getbyorder?oId=${o_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/payment/getbyorder?oId=${o_id}`) 
+        .then((response) => response.data) 
         .then((data) => {
             setPayment(data.data); 
         })

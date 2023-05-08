@@ -13,7 +13,10 @@ import Profile from './components/Navbar/Profile';
 import MyOrders from './components/Navbar/MyOrders';
 import BookTickets from './components/Navbar/BookTickets';
 import AdminProfile from './components/Navbar/AdminProfile';
-import {BrowserRouter,Route,Routes} from 'react-router-dom'
+import {BrowserRouter,Route,Routes} from 'react-router-dom'; 
+import axios from 'axios'; 
+
+axios.defaults.withCredentials = true; 
 
 function App() {
   const [login,setLogin] = useState(false)

@@ -4,15 +4,16 @@ import Slider from "react-slick";
 
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import './Stores.css'; 
+import './Stores.css';  
+import axios from 'axios';
 
 export function StoreDisplay() { 
     const [category, setCategory] = useState([]); 
     const [storeData, setStoreData] = useState([]); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/store/listctg') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/store/listctg') 
+        .then((response) => response.data) 
         .then((data) => {
             console.log("get category")
             setCategory(data.data); 
@@ -20,8 +21,8 @@ export function StoreDisplay() {
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/store/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/store/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setStoreData(data.data); 
         })
@@ -53,8 +54,6 @@ export function StoreDisplay() {
             </ul>
         </div>
     );
-    
-
 } 
 
 function StoreBar({ctg_id, storeData}) {   
@@ -94,8 +93,8 @@ function GetMenu({st_id}) {
     }; 
 
     useEffect(() => {
-        fetch(`http://localhost:8080/store/getmi?stId=${st_id}`) 
-        .then((response) => response.json()) 
+        axios.get(`http://localhost:8080/store/getmi?stId=${st_id}`) 
+        .then((response) => response.data) 
         .then((data) => {
             setMenuItems(data.data); 
             setCount(menuItems.length); 
@@ -116,13 +115,24 @@ function GetMenu({st_id}) {
             }
             </Slider>
         ); 
+    } else if (count == 2) {
+        return (
+            <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                {
+                    menuItems.map((item, index) => 
+                    <div key = {index} className='menu'>
+                        <img src={require(`./images/menuitem/${item.mi_name}.jpg`)} alt={item.mi_name} className = 'itemImage2'/>
+                        <label>{item.mi_name} ${item.mi_unit_price}</label>
+                    </div>)
+                }
+            </div>);
     }
     return (
-    <div>
+    <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
         {
             menuItems.map((item, index) => 
-            <div key = {index} style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <img src={require(`./images/menuitem/${item.mi_name}.jpg`)} alt={item.mi_name} className = 'itemImage2'/>
+            <div key = {index} className='menu'>
+                <img src={require(`./images/menuitem/${item.mi_name}.jpg`)} alt={item.mi_name} className = 'itemImage3'/>
                 <label>{item.mi_name} ${item.mi_unit_price}</label>
             </div>)
         }

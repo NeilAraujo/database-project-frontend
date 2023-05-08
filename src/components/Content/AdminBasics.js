@@ -2,7 +2,6 @@ import React  from 'react';
 import { useState, useEffect } from 'react'; 
 import { Tag, Table, Button, Form, Input, Radio, TimePicker, Alert, Modal } from 'antd'; 
 
-import styled from 'styled-components'; 
 import './Admin.css';  
 
 import { AllVisitors } from './AdminTables'; 
@@ -12,38 +11,19 @@ import { AllShows } from './AdminTables';
 import { AllAttractions } from './AdminTables'; 
 import { AllStores } from './AdminTables';
 import { AllParkings } from './AdminTables';
+import axios from 'axios'; 
 
-const Tab = styled.button`
-  font-size: 16px;
-  font-style: bold;
-  padding: 1% 3%;
-  cursor: pointer;
-  opacity: 0.6;
-  background: white;
-  border: 0;
-  outline: 0;
-  ${({ active }) =>
-    active &&
-    `
-    border-bottom: 2px solid black;
-    opacity: 1;
-  `}
-`;
+import { Analysis, VisitorAnalysis } from './AdminAnalysis';
 
-const ButtonGroup = styled.div`
-  display: flex;
-`;
+const headers = { 'Content-Type': 'application/json', credentials: 'include'}
 
 export function AdminDisplay() {
     return (
         <div>
+            <Analysis />
             <TapGroup />
         </div>
     )
-} 
-
-export class Analysis {
-    
 } 
 
 function TapGroup() {
@@ -52,17 +32,16 @@ function TapGroup() {
     
     return (
         <div className='tabGroupBox'>
-          <ButtonGroup>
+          <div style = {{display: 'flex'}}>
             {titles.map(title => (
-              <Tab
+              <button
                 key={title}
-                active={activeTab === title}
                 onClick={() => setActiveTab(title)}
               >
                 {title}
-              </Tab>
+              </button>
             ))}
-          </ButtonGroup>
+          </div>
           <div className='tabContentBox'>
             {activeTab === 'All Visitors' && (
                 <AllVisitors /> 
@@ -88,7 +67,6 @@ function TapGroup() {
             {activeTab === 'All Stores' && (
                 <div>
                     <AllStores /> 
-                    <Button>Add Menu Item</Button> 
                     <Button style={{marginLeft:40}}>Add Store Menu Item</Button>
                 </div>
             )}
@@ -113,8 +91,8 @@ class AddShow extends React.Component {
             endTimeStr: '', 
             wheelchairAcc: '1', 
             price: NaN, 
-            type: '', 
-            typeId: 0,
+            type: 'drama', 
+            typeId: 1,
             alertMessage: '', 
             showAlert: false, 
             success: false, 
@@ -132,8 +110,8 @@ class AddShow extends React.Component {
     
     
     componentDidMount() {
-        fetch('http://localhost:8080/show/listshtype') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/show/listshtype') 
+        .then((response) => response.data) 
         .then((data) => {
             this.setState({
                 showTypes: data.data,
@@ -226,8 +204,8 @@ class AddShow extends React.Component {
                 const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate() 
                 const start = str + " " + this.state.startTimeStr
                 const end = str + " " + this.state.endTimeStr
-                fetch(`http://localhost:8080/show/add?shName=${this.state.name}&shDescription=${this.state.description}&shStartTime=${start}&shEndTime=${end}&shWheelchairAcc=${this.state.wheelchairAcc}&shPrice=${this.state.price}&shTypeId=${this.state.typeId}`, requestOptions)
-                    .then(response => response.json())
+                axios.post(`http://localhost:8080/show/add?shName=${this.state.name}&shDescription=${this.state.description}&shStartTime=${start}&shEndTime=${end}&shWheelchairAcc=${this.state.wheelchairAcc}&shPrice=${this.state.price}&shTypeId=${this.state.typeId}`, headers)
+                    .then(response => response.data)
                     .then(data => {
                         console.log("add show!") 
                         this.setState({
@@ -311,8 +289,7 @@ class AddShow extends React.Component {
                 ) : null
             }
         </div>)
-    }
-    
+    }  
 } 
 
 class AddAttraction extends React.Component { 
@@ -328,9 +305,9 @@ class AddAttraction extends React.Component {
             minimumHeight: NaN, 
             duration: NaN, 
             location: 'Lot A', 
-            locationId: 0, 
+            locationId: 1, 
             type: 'roller coaster', 
-            typeId: 0,
+            typeId: 1,
             alertMessage: '', 
             showAlert: false, 
             success: false, 
@@ -348,14 +325,14 @@ class AddAttraction extends React.Component {
     
     
     componentDidMount() {
-        fetch('http://localhost:8080/attraction/listatttype') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/attraction/listatttype') 
+        .then((response) => response.data) 
         .then((data) => {
             this.setState({
                 attractionTypes: data.data,
             }, () => {
-                fetch('http://localhost:8080/attraction/listls') 
-                .then((response) => response.json()) 
+                axios.get('http://localhost:8080/attraction/listls') 
+                .then((response) => response.data) 
                 .then((data) => {
                     this.setState({
                         locationSections: data.data,
@@ -459,12 +436,8 @@ class AddAttraction extends React.Component {
             this.setState({
                 showAlert: false, 
             }, () => {
-                const requestOptions = {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                }; 
-                fetch(`http://localhost:8080/attraction/add?attName=${this.state.name}&attDescription=${this.state.description}&attStatus=${this.state.status}&attCapacity=${this.state.capacity}&attMinimumHeight=${this.state.minimumHeight}&attDurationTime=${this.state.duration}&lsId=${this.state.locationId}&attTypeId=${this.state.typeId}`, requestOptions)
-                    .then(response => response.json())
+                axios.post(`http://localhost:8080/attraction/add?attName=${this.state.name}&attDescription=${this.state.description}&attStatus=${this.state.status}&attCapacity=${this.state.capacity}&attMinimumHeight=${this.state.minimumHeight}&attDurationTime=${this.state.duration}&lsId=${this.state.locationId}&attTypeId=${this.state.typeId}`, headers)
+                    .then(response => response.data)
                     .then(data => {
                         this.setState({
                             success: true
@@ -562,7 +535,109 @@ class AddAttraction extends React.Component {
                     />
                 ) : null
             }
-            <Button onClick = {this.handleAddAttraction} style ={{marginTop: 20}}>Add Attraction</Button> 
+            <Button onClick = {this.handleAddAttraction} style ={{marginTop: 20, border: null}}>Add Attraction</Button> 
+            {
+                (this.state.success) ? (
+                    <Alert style = {{marginTop:30}} message="Successfully Added!" type="success" showIcon />
+                ) : null
+            }
+        </div>)
+    }
+    
+}
+
+class AddMenuItem extends React.Component { 
+    constructor() {
+        super();
+        this.state = {
+            itemName: '', 
+            unitPrice: NaN,
+            alertMessage: '', 
+            showAlert: false, 
+            success: false, 
+        }
+        this.handleItemName = this.handleItemName.bind(this); 
+        this.handleUnitPrice = this.handleUnitPrice.bind(this); 
+    }
+
+    handleItemName(e) {
+        this.setState({
+            itemName: e.target.value.trim(),
+        }, () => {})
+    }
+
+    handleUnitPrice(e) {
+        this.setState({
+            unitPrice: parseInt(e.target.value.trim()), 
+        }, () => {
+            console.log("unit price: " + this.state.unitPrice)
+        }) 
+    }
+
+    handleMenuItem() {
+        if (this.state.itemName === '') {
+            this.setState({
+                alertMessage: "The name of menu item cannot be null.", 
+                showAlert: true, 
+            }, () => {})
+        } else if (isNaN(this.state.unitPrice)) {
+            this.setState({
+                alertMessage: "The unit price of menu item should be integer.", 
+                showAlert: true, 
+            }, () => {})
+        } else {
+            this.setState({
+                showAlert: false, 
+            }, () => {
+                axios.post(`http://localhost:8080/store/addmi?miName=${this.state.itemName}&miUnitPrice=${this.state.unitPrice}`, headers)
+                    .then(response => response.data)
+                    .then(data => {
+                        this.setState({
+                            success: true
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    success: false
+                                })
+                            }, 3000);
+                        })
+                    });
+            })
+        }
+    }
+
+    render() {
+        return (
+            <div className='operationBox'>
+                <div>
+            <Form labelCol={{
+                    span: 12,
+                  }}
+                  wrapperCol={{
+                    span: 14, 
+                  }}
+                  layout="horizontal" 
+                  style = {{marginTop: 30}}>
+                <Form.Item label="Menu Item Name">
+                    <Input placeholder="item name" onChange = {this.handleItemName}/>
+                </Form.Item>
+                <Form.Item label="Item Unit Price">
+                    <Input placeholder="unit price" onChange = {this.handleUnitPrice}/>
+                </Form.Item>
+            </Form> 
+            </div>
+            {
+                (this.state.showAlert) ? (
+                    <Alert
+                        message="Error"
+                        description={this.state.alertMessage}
+                        type="error"
+                        showIcon 
+                        style = {{marginTop: 30, width: 400}}
+                    />
+                ) : null
+            }
+            <Button onClick = {this.handleAddAttraction} style ={{marginTop: 20, border: null}}>Add Menu Item</Button> 
             {
                 (this.state.success) ? (
                     <Alert style = {{marginTop:30}} message="Successfully Added!" type="success" showIcon />

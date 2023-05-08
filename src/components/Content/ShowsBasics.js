@@ -2,9 +2,10 @@ import React from 'react';
 import { useState, useEffect } from 'react'; 
 import Slider from "react-slick"; 
 import './Shows.css';
+import axios from 'axios';
 
 import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick-theme.css"; 
 
 //not changed by database
 export function ShowDisplay() { 
@@ -23,16 +24,16 @@ export function ShowDisplay() {
       }; 
 
     useEffect(() => {
-        fetch('http://localhost:8080/show/listshtype') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/show/listshtype') 
+        .then((response) => response.data) 
         .then((data) => { 
             setTypeData(data.data); 
         })
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost:8080/show/list') 
-        .then((response) => response.json()) 
+        axios.get('http://localhost:8080/show/list') 
+        .then((response) => response.data) 
         .then((data) => {
             setShowData(data.data); 
         })
@@ -83,7 +84,6 @@ function ShowBlock({typeData, showData}) {
             </ul>
         </div>
     )
-    
 }
 
 function ShowBar({showType, showData}) {
