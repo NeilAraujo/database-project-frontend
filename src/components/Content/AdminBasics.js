@@ -67,7 +67,8 @@ function TapGroup() {
             {activeTab === 'All Stores' && (
                 <div>
                     <AllStores /> 
-                    <Button style={{marginLeft:40}}>Add Store Menu Item</Button>
+                    <AddMenuItem />
+                    <AddStoreItem />
                 </div>
             )}
             {activeTab === 'All Parkings' && (
@@ -558,6 +559,7 @@ class AddMenuItem extends React.Component {
         }
         this.handleItemName = this.handleItemName.bind(this); 
         this.handleUnitPrice = this.handleUnitPrice.bind(this); 
+        this.handleAddMenuItem = this.handleAddMenuItem.bind(this); 
     }
 
     handleItemName(e) {
@@ -574,7 +576,7 @@ class AddMenuItem extends React.Component {
         }) 
     }
 
-    handleMenuItem() {
+    handleAddMenuItem() {
         if (this.state.itemName === '') {
             this.setState({
                 alertMessage: "The name of menu item cannot be null.", 
@@ -637,7 +639,113 @@ class AddMenuItem extends React.Component {
                     />
                 ) : null
             }
-            <Button onClick = {this.handleAddAttraction} style ={{marginTop: 20, border: null}}>Add Menu Item</Button> 
+            <Button onClick = {this.handleAddMenuItem} style ={{marginTop: 20, border: null}}>Add Menu Item</Button> 
+            {
+                (this.state.success) ? (
+                    <Alert style = {{marginTop:30}} message="Successfully Added!" type="success" showIcon />
+                ) : null
+            }
+        </div>)
+    }
+    
+}
+
+class AddStoreItem extends React.Component { 
+    constructor() {
+        super();
+        this.state = {
+            storeId: 1,
+            itemId: 1, 
+            stores: [], 
+            items: [], 
+            success: false, 
+        }
+        this.handleStore = this.handleStore.bind(this); 
+        this.handleItem = this.handleItem.bind(this); 
+        this.handleAddMenuItem = this.handleAddMenuItem.bind(this); 
+    }
+
+    componentDidMount() {
+        axios.get('http://localhost:8080/store/list')
+            .then(response => response.data)
+            .then(data => this.setState({ stores: data.data }, () => {
+                axios.get('http://localhost:8080/store/listmi')
+                .then(response => response.data)
+                .then(data => this.setState({ items: data.data }));
+            })); 
+
+        console.log("stores: " + this.state.stores)
+    }    
+
+    handleStore(e) {
+        this.setState({
+            storeId: e.target.value, 
+        })
+    }
+
+    handleItem(e) {
+        this.setState({
+            itemId: e.target.value, 
+        })
+    }
+
+
+    handleAddMenuItem() { 
+        axios.post(`http://localhost:8080/store/addmist?stId=${this.state.storeId}&miId=${this.state.itemId}`, headers)
+            .then(response => response.data)
+            .then(data => {
+                this.setState({
+                    success: true
+                }, () => {
+                    setTimeout(() => {
+                        this.setState({
+                            success: false
+                        })
+                    }, 3000);
+                })
+            });
+    }
+
+    render() {
+        return (
+            <div className='operationBox'>
+                <div>
+            <Form labelCol={{
+                    span: 12,
+                  }}
+                  wrapperCol={{
+                    span: 14, 
+                  }}
+                  layout="horizontal" 
+                  style = {{marginTop: 30}}>
+                <Form.Item label="Select a store">
+                    <select name = 'storeId' defaultValue = '1' onChange = {this.handleStore} style = {{fontSize: 15}}> {
+                        this.state.stores.map( store => (
+                            <option key = {store.st_id} value = {store.st_id}> {store.st_name} </option>))
+                    }
+                    </select>
+                </Form.Item>
+                <Form.Item label="Select a menu item">
+                    <select name = 'itemId' defaultValue = '1' onChange = {this.handleItem} style = {{fontSize: 15}}> {
+                        this.state.items.map( item => (
+                            <option key = {item.mi_id} value = {item.mi_id}> {item.mi_name} </option>))
+                    }
+                    </select>
+                </Form.Item>
+            </Form> 
+            </div>
+            {
+                (this.state.showAlert) ? (
+                    <Alert
+                        message="Error"
+                        description={this.state.alertMessage}
+                        type="error"
+                        showIcon 
+                        style = {{marginTop: 30, width: 400}}
+                    />
+                ) : null
+            }
+            <Button onClick = {this.handleAddMenuItem} style ={{marginTop: 20, border: null}}>Add Store Item</Button> 
             {
                 (this.state.success) ? (
                     <Alert style = {{marginTop:30}} message="Successfully Added!" type="success" showIcon />

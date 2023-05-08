@@ -1,15 +1,12 @@
 import React  from 'react';
-import { useState, useCallback } from 'react'; 
+import { useState, useCallback, PureComponent } from 'react'; 
 
 import './Admin.css'; 
 import axios from 'axios'; 
 import { Pie, PieChart, Sector, Label } from 'recharts'; 
-
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts'; 
-
-import { RadialBarChart, RadialBar, Legend} from 'recharts';
-
-
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'; 
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { RadialBarChart, RadialBar, Legend } from 'recharts';
 
 export function Analysis() {
     return (
@@ -17,10 +14,151 @@ export function Analysis() {
         <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
         <VisitorAnalysis />
         <OrderAnalysis />
-        </div>
+        </div >
+        <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
         <TicketAnalysis />
+        <StoreAnalysis />
+        <AttractionAnalysis />
+        </div>
     </div>)
 } 
+
+class AttractionAnalysis extends React.Component {
+    state = {
+        data: [], 
+    }
+    
+    componentDidMount() {
+        axios.get('http://localhost:8080/attraction/count')
+        .then((response) => response.data) 
+        .then((data) => {
+            console.log("get attraction count: " + data); 
+            this.setState({
+                data: [ 
+                    {
+                        name: 'roller coaster', 
+                        value: data.rollercoaster, 
+                    },
+                    {
+                        name: 'water ride', 
+                        value: data.waterride,
+                    }, 
+                    {
+                        name: 'dark ride', 
+                        value: data.darkride,
+                    }, 
+                    {
+                        name: 'kid ride', 
+                        value: data.kidride, 
+                    }, 
+                    {
+                        name: 'vr ride', 
+                        value: data.vrride, 
+                    }, 
+                ], 
+            }, () => {
+                console.log(this.state.data); 
+            }) 
+            
+        })
+    } 
+
+    render() {
+        return ( 
+        <div style = {{marginTop: 30}}>
+            <label style={{color: "#8C8C8C"}}>Attraction Visit Distribution</label>
+            <RadarChart 
+            width={400}
+            height={300}
+            cx="50%" 
+            cy="50%" 
+            outerRadius="80%" data={this.state.data}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="name" />
+            <PolarRadiusAxis />
+            <Radar dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+            </RadarChart>
+        </div>
+        );
+    }
+}
+
+class StoreAnalysis extends React.Component {
+    state = {
+        data: [], 
+    }
+    
+    componentDidMount() {
+        axios.get('http://localhost:8080/store/salescount')
+        .then((response) => response.data) 
+        .then((data) => {
+            console.log("get store count: " + data); 
+            this.setState({
+                data: [ 
+                    {
+                        name: 'apparels', 
+                        amount: data.apparels, 
+                        fill: '#8dd1e1',
+                    },
+                    {
+                        name: 'icecreamparlor', 
+                        amount: data.icecreamparlor, 
+                        fill: '#82ca9d',
+                    }, 
+                    {
+                        name: 'restaurant', 
+                        amount: data.restaurant, 
+                        fill: '#a4de6c',
+                    }, 
+                    {
+                        name: 'giftshop', 
+                        amount: data.giftshop, 
+                        fill: '#d0ed57',
+                    }, 
+                    {
+                        name: 'foodstall', 
+                        amount: data.foodstall, 
+                        fill: '#ffc658',
+                    }, 
+                ], 
+            }, () => {
+                console.log(this.state.data); 
+            }) 
+            
+        })
+    }
+
+    render() {
+        return ( 
+        <div style = {{marginTop: 30}}>
+            <label style={{color: "#8C8C8C"}}>Store Sales Distribution</label>
+            <RadialBarChart 
+            width={320}
+            height={300}
+            cx="60%" 
+            cy="50%" 
+            innerRadius="10%" 
+            outerRadius="80%" barSize={10} data={this.state.data}>
+            <RadialBar
+                minAngle={15}
+                label={{ position: 'insideStart', fill: '#8884d8' }}
+                background
+                clockWise
+                dataKey="amount"
+            />
+            <Legend iconSize={10} layout="vertical" verticalAlign="middle" wrapperStyle={style} />
+            </RadialBarChart>
+        </div>
+        );
+    }
+}
+
+const style = {
+    top: '50%',
+    left: '10%',
+    transform: 'translate(0, -50%)',
+    lineHeight: '24px',
+  };
 
 class TicketAnalysis extends React.Component {
     state = {
@@ -58,7 +196,7 @@ class TicketAnalysis extends React.Component {
         return ( 
         <div>
             <BarChart
-            width={400}
+            width={360}
             height={300}
             data={this.state.data}
             margin={{
@@ -72,7 +210,7 @@ class TicketAnalysis extends React.Component {
             <XAxis dataKey="name" />
             <YAxis label={{ value: 'Ticket Distribution', angle: -90, offset: 0, position: 'left' }} />
             <Tooltip />
-            <Bar dataKey="amount" fill="#8884d8" barSize={60}/>
+            <Bar dataKey="amount" fill="#ffc658" barSize={40}/>
             </BarChart>
         </div>
         );
@@ -251,7 +389,7 @@ const renderActiveShape = (props) => {
           outerRadius={outerRadius}
           startAngle={startAngle}
           endAngle={endAngle}
-          fill={fill}
+          fill={"#8dd1e1"}
         />
         <Sector
           cx={cx}
@@ -260,7 +398,7 @@ const renderActiveShape = (props) => {
           endAngle={endAngle}
           innerRadius={outerRadius + 6}
           outerRadius={outerRadius + 10}
-          fill={fill}
+          fill={"#8dd1e1"}
         />
         <path
           d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
