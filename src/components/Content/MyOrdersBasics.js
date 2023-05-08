@@ -138,15 +138,15 @@ function GetStoreDescription({st_id, mi_id}) {
     } ,[]); 
 
     useEffect(() => {
-        console.log(menuItems);
+        //console.log(menuItems);
     }, [menuItems]);
 
     useEffect(() => {
-        console.log(store); 
+        //console.log(store); 
     }, [store]);
 
     useEffect(() => {
-        console.log(item); 
+        //console.log(item); 
     }, [item]);
 
     function getMenu() {
@@ -176,11 +176,11 @@ function GetShowDescription({sh_id}) {
     } ,[]);
     
     useEffect(() => {
-        console.log(showName); 
+        //console.log(showName); 
     } ,[showName]); 
 
     useEffect(() => {
-        console.log(description); 
+        //console.log(description); 
     } ,[description]); 
 
     function getShow() {
@@ -207,19 +207,19 @@ function GetParkDescription({park_id}) {
     } ,[]); 
 
     useEffect(() => {
-        console.log("parkLots: " + parkLots); 
+        //console.log("parkLots: " + parkLots); 
     }, [parkLots]);
 
     useEffect(() => {
-        console.log(timeIn); 
+        //console.log(timeIn); 
     }, [timeIn]);
 
     useEffect(() => {
-        console.log(timeOut); 
+        //console.log(timeOut); 
     }, [timeOut]); 
 
     useEffect(() => {
-        console.log(lotName); 
+        //console.log(lotName); 
     }, [lotName]); 
 
 
@@ -244,19 +244,34 @@ function GetParkDescription({park_id}) {
 
 function GetPayment({o_id}) {
     const [payment, setPayment] = useState([]); 
+    const [cardNumber, setCardNumber] = useState(''); 
+    const [cardCredit, setCardCredit] = useState(false); 
     useEffect(() => {
+        console.log("order id: " + o_id);
         axios.get(`http://localhost:8080/payment/getbyorder?oId=${o_id}`) 
         .then((response) => response.data) 
         .then((data) => {
             setPayment(data.data); 
+            //console.log("payment: " + data.data[0].pay_id)
+            if(data.data.length > 0 && data.data[0].pay_method === 'CD') {
+                axios.get(`http://localhost:8080/payment/getcd?payId=${data.data[0].pay_id}`) 
+                .then((response) => response.data) 
+                .then((data) => { 
+                    setCardNumber(data.data.cd_num.length >= 4 ? data.data.cd_num.slice(-4) : data.data.cd_num); 
+                    setCardCredit(data.data.cd_credit === '1'); 
+                    console.log("card: " + cardNumber + " credit?: " + data.data.cd_credit)
+                })
+            }
         })
     } ,[]); 
     if (payment.length === 0) {
         return <label style={{fontSize: 14}}>Payment: Unpaid</label>
     } else if (payment[0].pay_method === 'CA') {
         return <label style={{fontSize: 14}}>Payment: Cash</label>
+    } else if (cardCredit){
+        return <label style={{fontSize: 14}}>Credit Card: ****{cardNumber}</label>
     } else {
-        return <label style={{fontSize: 14}}>Payment: Card</label>
+        return <label style={{fontSize: 14}}>Dedit Card: ****{cardNumber}</label>
     }
 }
 
