@@ -9,6 +9,7 @@ const Home = () => {
             console.log(data)
         })
     },[])
+    
     return (
         <div style={{height:'100vh',width:'100%'}}>
                 <div style={{padding:20, display:'flex', flexDirection:'row', alignItems:'center', backgroundColor:'#e6ca6e'}}>

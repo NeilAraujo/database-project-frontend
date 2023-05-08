@@ -16,6 +16,9 @@ import BookTickets from './components/Navbar/BookTickets';
 import AdminProfile from './components/Navbar/AdminProfile';
 import {BrowserRouter,Route,Routes, Redirect, Navigate} from 'react-router-dom'
 import AppContext from './AppContext';
+import axios from 'axios'; 
+
+axios.defaults.withCredentials = true; 
 
 function App() {
   const [login,setLogin] = useState(false)
