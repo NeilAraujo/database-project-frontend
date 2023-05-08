@@ -33,6 +33,7 @@ const Profile = () => {
         .then(data=> {
             if(data.success === true){
                 myContext.setLogin(false)
+                localStorage.setItem("Login",false)
                 navigate("/")
             }
         })

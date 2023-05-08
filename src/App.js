@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState , useContext} from 'react';
 import './App.css';
 import CustLogin from './components/Authentication/Customer/CustLogin';
 import CustSignUp from './components/Authentication/Customer/CustSignUp';
@@ -21,13 +21,22 @@ import axios from 'axios';
 axios.defaults.withCredentials = true; 
 
 function App() {
-  const [login,setLogin] = useState(false)
-  const [admin,setAdmin] = useState(false)
+  const [login,setLogin] = useState()
+  const [admin,setAdmin] = useState()
+  const myContext = useContext(AppContext);
 
   const userSettings = {
     loginname:login, 
     setLogin
   };
+
+  useEffect(()=>{
+    console.log("Refresh")
+    setLogin(false) 
+    setAdmin(false)
+    console.log(localStorage.getItem("Login"))
+  },[])
+
 
   useEffect(()=>{ 
     fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
@@ -48,7 +57,7 @@ function App() {
 
         {/* <Navigate to="/custlogin"/> */}
 
-        {!login && 
+        {localStorage.getItem("Login")==="false" && 
         <div>
          <Routes>
               <Route path="/" element={<Navigate to ="/custlogin" />}/>
@@ -60,7 +69,7 @@ function App() {
        }
 
         {
-          login && !admin &&
+          localStorage.getItem("Login")==="true" && !admin &&
           <div>
           <Navbar admin={admin}/>
           <div> 
@@ -81,7 +90,7 @@ function App() {
         }
 
         {
-          login && admin &&
+          localStorage.getItem("Login")==="true" && admin &&
           <div>
           <Navbar admin={admin}/>
           <div> 

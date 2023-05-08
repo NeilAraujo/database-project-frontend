@@ -34,6 +34,7 @@ const CustLogin = () => {
                             setLoginError(false)
                             setAdminError(false)
                             myContext.setLogin(true)
+                            localStorage.setItem("Login",true)
                         }
                     })
                 }else{
