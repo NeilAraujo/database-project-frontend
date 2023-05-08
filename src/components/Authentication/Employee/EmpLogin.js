@@ -1,6 +1,7 @@
 import React,{useState,useContext} from 'react';
 import {Link,NavLink, useNavigate} from 'react-router-dom'
 import AppContext from '../../../AppContext';
+import axios from 'axios';
 
 const EmpLogin = () => {
     const [email, onChangeEmail] = useState('');
@@ -10,30 +11,27 @@ const EmpLogin = () => {
     const myContext = useContext(AppContext);
 
     const HandleLogin = () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                accEmail: email,
-                accPwd: password
-            }),
-            credentials:'include'
-        };
-        console.log(requestOptions.body)
-        fetch('http://localhost:8080/account/login', requestOptions)
-            .then(response => response.json())
+        const headers = { 'Content-Type': 'application/json' }; 
+        const body = JSON.stringify({ 
+            accEmail: email,
+            accPwd: password
+        }); 
+        
+        axios.post('http://localhost:8080/account/login', body, {headers})
+            .then(response => response.data)
             .then(data => { 
                 if(data.success === false){
                     setLoginError(true)
                 }else{
                     setLoginError(false)
-                    fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
-                    .then(response=>response.json())
+                    axios.get('http://localhost:8080/account/getrole')
+                    .then(response=>response.data)
                     .then(data=> {
                         if(data.data === "admin"){
                             setAdminError(false)
                             setLoginError(false)
                             myContext.setLogin(true)
+                            sessionStorage.setItem("Login",true)
                         }else{
                             setAdminError(true)
                         }

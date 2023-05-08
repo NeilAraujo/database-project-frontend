@@ -17,6 +17,7 @@ export function AttractionDisplay() {
       axios.get('http://localhost:8080/attraction/listatttype')
       .then((response) => response.data) 
       .then((data) => {
+          console.log("raw type data: " + data.data)
           setTypeData(data.data); 
       })
     }, []);
@@ -37,8 +38,12 @@ export function AttractionDisplay() {
       })
     }, [])
     
+    console.log("typeData: " + typeData)
     return (
       <div>
+        {
+          console.log("attractions refresh")
+        }
           <TabGroup typeData={typeData} attraction={attraction} location={location}/>
       </div>
     )

@@ -1,9 +1,16 @@
 import React  from 'react';
 import { useState, useEffect } from 'react'; 
-import { Tag, Table } from 'antd'; 
+import { Tag, Table, Button, Modal } from 'antd'; 
+import { DeleteTwoTone } from '@ant-design/icons';
 
 import './Admin.css'; 
 import axios from 'axios';
+
+import { ExclamationCircleFilled } from '@ant-design/icons';
+
+const { confirm } = Modal;
+
+const headers = { 'Content-Type': 'application/json', credentials: 'include'}
 
 const { Column, ColumnGroup } = Table;
 
@@ -25,7 +32,7 @@ export function AllVisitors() {
 function ShowAllVisitors({visitorData}) {
     
     return (
-    <Table dataSource={visitorData}>
+    <Table dataSource={visitorData} style={{width: '100%'}}>
         <Column title="ID" dataIndex="v_id" key="v_id" />
         <ColumnGroup title="Name">
             <Column title="First Name" dataIndex="v_fname" key="v_fname" />
@@ -158,7 +165,7 @@ function ShowAllTickets ({typeData, ticketData}) {
         }, 
     ];
     
-    return (<Table columns={columns} dataSource={ticketData} />);
+    return (<Table columns={columns} dataSource={ticketData} style={{width: '100%'}}/>);
 }
 
 export function AllShows() { 
@@ -247,10 +254,39 @@ function ShowAllShows ({ typeData, showData }) {
             render: (_, {sh_price}) => {
                 return <label>$ {sh_price}</label>
             }
-        }, 
+        }, {
+            title: 'Action',
+            key: 'action',
+            render: (_, {sh_id}) => (
+                <div>
+                    <Button onClick={() => handleDelete(sh_id)}>
+                        <DeleteTwoTone />
+                    </Button> 
+                </div>
+            ),
+        },
     ];
-    
-    return (<Table columns={columns} dataSource={showData} />);
+
+    function handleDelete(sh_id) {
+        confirm({
+            title: '',
+            icon: <ExclamationCircleFilled />,
+            content: 'Do you want to delete this show?',
+            onOk() {
+              console.log('OK');
+              axios.delete(`http://localhost:8080/show/delete?shId=${sh_id}`).then((response) => response.data) 
+                .then((data) => {
+                    console.log("delete complete!")
+                    window.location.reload();
+                })
+            },
+            onCancel() {
+              console.log('Cancel');
+            },
+          });
+    }
+
+    return (<Table columns={columns} dataSource={showData} style={{width: '100%'}}/>);
 }
 
 export function AllAttractions() { 
@@ -357,10 +393,39 @@ function ShowAllAttractions({typeData, location, attraction}) {
             render: (_, {ls_id}) => {
                 return <label>{getLocation(ls_id)}</label>
             }
-        }, 
+        }, {
+            title: 'Action',
+            key: 'action',
+            render: (_, {att_id}) => (
+                <div>
+                    <Button onClick={() => handleDelete(att_id)}>
+                        <DeleteTwoTone />
+                    </Button> 
+                </div>
+            ),
+        },
     ];
+
+    function handleDelete(att_id) {
+        confirm({
+            title: '',
+            icon: <ExclamationCircleFilled />,
+            content: 'Do you want to delete this attraction?',
+            onOk() {
+              console.log('OK');
+              axios.delete(`http://localhost:8080/attraction/delete?attId=${att_id}`).then((response) => response.data) 
+                .then((data) => {
+                    console.log("delete complete!")
+                    window.location.reload();
+                })
+            },
+            onCancel() {
+              console.log('Cancel');
+            },
+          });
+    }
     
-    return (<Table columns={columns} dataSource={attraction} />);
+    return (<Table columns={columns} dataSource={attraction} style={{width: '100%'}}/>);
 }
 
 export function AllStores() {
@@ -426,7 +491,7 @@ function ShowAllStores({category, storeData}) {
         },  
     ];
 
-    return (<Table columns={columns} dataSource={storeData} />);
+    return (<Table columns={columns} dataSource={storeData} style={{width: '100%'}}/>);
 } 
 
 function GetMenu({st_id}) {
@@ -518,7 +583,7 @@ function ShowAllParkings({parkLot, parking}) {
         },   
     ];
 
-    return (<Table columns={columns} dataSource={parking} />);
+    return (<Table columns={columns} dataSource={parking} style={{width: '100%'}}/>);
 }
 
 
@@ -653,7 +718,7 @@ function ShowAllOrders({orderData}) {
         },  
     ];
     
-    return (<Table columns={columns} dataSource={orderData} />);
+    return (<Table columns={columns} dataSource={orderData} style={{width: '100%'}}/>);
 } 
 
 function GetPayment({pay_id}) {

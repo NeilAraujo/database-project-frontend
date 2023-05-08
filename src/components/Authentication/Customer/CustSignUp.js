@@ -2,6 +2,7 @@ import React,{useEffect, useState} from 'react';
 import {Link,NavLink, useNavigate} from 'react-router-dom'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import axios from 'axios';
 
 const CustSignUp = () => {
     const [email, onChangeEmail] = useState('');
@@ -28,30 +29,27 @@ const CustSignUp = () => {
     const navigate = useNavigate();
 
     const handlesignup = () =>{
-        if(vtype === "S"){
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    accEmail: email,
-                    accPwd: password,
-                    vfName: fname,
-                    vmName: mname,
-                    vlName: lname ,
-                    vstAdd: staddr,
-                    vcity:city,
-                    vstate:state,
-                    vcountry:country,
-                    vemail:email,
-                    vtelNum: phno,
-                    vtype: "S",
-                    vbDate: bday,
-                    stuSchool: school
-                })
-            };
-            console.log(requestOptions.body)
-            fetch('http://localhost:8080/account/stu/register', requestOptions)
-                .then(response => response.json())
+        if(vtype === "S"){ 
+            const headers = { 'Content-Type': 'application/json' }; 
+            const body = JSON.stringify({ 
+                accEmail: email,
+                accPwd: password,
+                vfName: fname,
+                vmName: mname,
+                vlName: lname ,
+                vstAdd: staddr,
+                vcity:city,
+                vstate:state,
+                vcountry:country,
+                vemail:email,
+                vtelNum: phno,
+                vtype: "S",
+                vbDate: bday,
+                stuSchool: school
+            })
+            console.log(body)
+            axios.post('http://localhost:8080/account/stu/register', body, {headers})
+                .then(response => response.data)
                 .then(data => {
                     if(data.status === "fail"){
                         setEmailError(true)
@@ -63,32 +61,29 @@ const CustSignUp = () => {
         }
 
         if(vtype === "M"){
-            console.log(new Date(new Date().setFullYear(new Date().getFullYear()+1)).getFullYear())
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    accEmail: email,
-                    accPwd: password,
-                    vfName: fname,
-                    vmName: mname,
-                    vlName: lname ,
-                    vstAdd: staddr,
-                    vcity:city,
-                    vstate:state,
-                    vcountry:country,
-                    vemail:email,
-                    vtelNum: phno,
-                    vtype: "M",
-                    vbDate: bday,
-                    mstartDate:new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() ,
-                    mendDate: new Date(new Date().setFullYear(new Date().getFullYear()+1)).getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
-                    mnumPurchased: 0
-                })
-            };
-            console.log(requestOptions.body)
-            fetch('http://localhost:8080/account/member/register', requestOptions)
-                .then(response => response.json())
+            //console.log(new Date(new Date().setFullYear(new Date().getFullYear()+1)).getFullYear())
+            const headers = { 'Content-Type': 'application/json' }; 
+            const body = JSON.stringify({ 
+                accEmail: email,
+                accPwd: password,
+                vfName: fname,
+                vmName: mname,
+                vlName: lname ,
+                vstAdd: staddr,
+                vcity:city,
+                vstate:state,
+                vcountry:country,
+                vemail:email,
+                vtelNum: phno,
+                vtype: "M",
+                vbDate: bday,
+                mstartDate:new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() ,
+                mendDate: new Date(new Date().setFullYear(new Date().getFullYear()+1)).getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
+                mnumPurchased: 0
+            })
+            console.log(body)
+            axios.post('http://localhost:8080/account/member/register', body, {headers})
+                .then(response => response.data)
                 .then(data => {
                     if(data.status === "fail"){
                         setEmailError(true)
@@ -100,29 +95,27 @@ const CustSignUp = () => {
         }
 
         if(vtype === "I"){
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    accEmail: email,
-                    accPwd: password,
-                    vfName: fname,
-                    vmName: mname,
-                    vlName: lname ,
-                    vstAdd: staddr,
-                    vcity:city,
-                    vstate:state,
-                    vcountry:country,
-                    vemail:email,
-                    vtelNum: phno,
-                    vtype: "I",
-                    vbDate: bday,
-                    itimesVisit: 0
-                })
-            };
-            console.log(requestOptions.body)
-            fetch('http://localhost:8080/account/indi/register', requestOptions)
-                .then(response => response.json())
+            const headers = { 'Content-Type': 'application/json' }; 
+            const body = JSON.stringify({ 
+                accEmail: email,
+                accPwd: password,
+                vfName: fname,
+                vmName: mname,
+                vlName: lname ,
+                vstAdd: staddr,
+                vcity:city,
+                vstate:state,
+                vcountry:country,
+                vemail:email,
+                vtelNum: phno,
+                vtype: "I",
+                vbDate: bday,
+                itimesVisit: 0
+            })
+        
+            console.log(body)
+            axios.post('http://localhost:8080/account/indi/register', body, {headers})
+                .then(response => response.data)
                 .then(data => {
                     if(data.status === "fail"){
                         setEmailError(true)
@@ -134,29 +127,27 @@ const CustSignUp = () => {
         }
 
         if(vtype === "G"){
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    accEmail: email,
-                    accPwd: password,
-                    vfName: fname,
-                    vmName: mname,
-                    vlName: lname ,
-                    vstAdd: staddr,
-                    vcity:city,
-                    vstate:state,
-                    vcountry:country,
-                    vemail:email,
-                    vtelNum: phno,
-                    vtype: "G",
-                    vbDate: bday,
-                    gsize: 0
-                })
-            };
-            console.log(requestOptions.body)
-            fetch('http://localhost:8080/account/group/register', requestOptions)
-                .then(response => response.json())
+            const headers = { 'Content-Type': 'application/json' }; 
+            const body = JSON.stringify({ 
+                accEmail: email,
+                accPwd: password,
+                vfName: fname,
+                vmName: mname,
+                vlName: lname ,
+                vstAdd: staddr,
+                vcity:city,
+                vstate:state,
+                vcountry:country,
+                vemail:email,
+                vtelNum: phno,
+                vtype: "G",
+                vbDate: bday,
+                gsize: 0
+            })
+            
+            console.log(body)
+            axios.post('http://localhost:8080/account/group/register', body, {headers})
+                .then(response => response.data)
                 .then(data => {
                     if(data.status === "fail"){
                         setEmailError(true)

@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import './CustLogin.css'
 import {Link,NavLink, useNavigate} from 'react-router-dom'
 import AppContext from '../../../AppContext';
+import axios from 'axios';
 
 const CustLogin = () => {
     const [email, onChangeEmail] = useState('');
@@ -11,22 +12,27 @@ const CustLogin = () => {
     const [adminerror,setAdminError] = useState(false)
 
     const HandleLogin = () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                accEmail: email,
-                accPwd: password
-            }),
-            credentials:'include'
-        };
-        fetch('http://localhost:8080/account/login', requestOptions)
-            .then(response => response.json())
+        const headers = { 'Content-Type': 'application/json' }; 
+        const body = JSON.stringify({ 
+            accEmail: email,
+            accPwd: password
+        });
+        // const requestOptions = {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({ 
+        //         accEmail: email,
+        //         accPwd: password
+        //     }),
+        //     credentials:'include'
+        // };
+        axios.post('http://localhost:8080/account/login', body, {headers})
+            .then(response => response.data)
             .then(data => { 
                 console.log(data)
                 if(data.success === true){
-                    fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
-                    .then(response=>response.json())
+                    axios.get('http://localhost:8080/account/getrole')
+                    .then(response=>response.data)
                     .then(data=> {
                         if(data.data==="admin"){
                             setAdminError(true)
@@ -34,7 +40,7 @@ const CustLogin = () => {
                             setLoginError(false)
                             setAdminError(false)
                             myContext.setLogin(true)
-                            localStorage.setItem("Login",true)
+                            sessionStorage.setItem("Login",true)
                         }
                     })
                 }else{

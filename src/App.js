@@ -27,20 +27,22 @@ function App() {
 
   const userSettings = {
     loginname:login, 
-    setLogin
+    adminname:admin,
+    setLogin,
+    setAdmin, 
   };
 
   useEffect(()=>{
     console.log("Refresh")
     setLogin(false) 
     setAdmin(false)
-    console.log(localStorage.getItem("Login"))
+    console.log(sessionStorage.getItem("Login"))
   },[])
 
 
   useEffect(()=>{ 
-    fetch('http://localhost:8080/account/getrole',{method:'GET',credentials:'include'})
-    .then(response=>response.json())
+    axios.get('http://localhost:8080/account/getrole')
+    .then(response=>response.data)
     .then(data=> {
         if(data.data === "admin"){
             setAdmin(true) 
@@ -51,62 +53,68 @@ function App() {
   return ( 
   <AppContext.Provider value={userSettings}>
   <BrowserRouter>
-    <div className="App">
-      {/* <header className="App-header"> */}
-        {/* <CustSignUp/> */}
+  <div className="App">
 
-        {/* <Navigate to="/custlogin"/> */}
-
-        {((localStorage.getItem("Login")===null) || (localStorage.getItem("Login")==="false")) && 
+    {
+      console.log("login in session: " + sessionStorage.getItem("Login"))
+    }
+      {((sessionStorage.getItem("Login")===null) || (sessionStorage.getItem("Login")==="false")) && 
         <div>
-         <Routes>
-              <Route path="/" element={<Navigate to ="/custlogin" />}/>
-              <Route exact path="/custlogin" element={<CustLogin/>}/>
-              <Route exact path="/custsignup" element={<CustSignUp/>}/>
-              <Route exact path="/emplogin" element={<EmpLogin/>}/>
-         </Routes>
-         </div>
-       }
-
-        {
-          localStorage.getItem("Login")==="true" && !admin &&
-          <div>
-          <Navbar admin={admin}/>
-          <div> 
+          {
+            console.log("login here1!")
+          }
           <Routes>
-              <Route path="/custlogin" element={<Navigate to ="/" />}/>
-              <Route exact path="/" element={<Home/>}/>
-              <Route exact path="/about"  element={<AboutUs/>} />
-              <Route exact path="/contact"  element={<ContactUs/>} /> 
-              <Route exact path="/attractions" element={<Attractions/>}/>
-              <Route exact path="/stores" element={<Stores/>} />
-              <Route exact path="/shows" element={<Shows/>} />
-              <Route exact path="/book" element={<BookTickets/>} />
-              <Route exact path="/orders" element={<MyOrders/>} />
-              <Route exact path="/profile" element={<Profile/>} />
+                <Route path="/" element={<Navigate to ="/custlogin" />}/>
+                <Route exact path="/custlogin" element={<CustLogin/>}/>
+                <Route exact path="/custsignup" element={<CustSignUp/>}/>
+                <Route exact path="/emplogin" element={<EmpLogin/>}/>
           </Routes>
         </div>
+      }
+      {
+          
+          (sessionStorage.getItem("Login")==="true" && !admin) && 
+          <div>
+            <Navbar admin={admin}/>
+            {
+              console.log("login here2!")
+            }
+            <Routes>
+                <Route path="/custlogin" element={<Navigate to ="/" />}/>
+                <Route exact path="/" element={<Home/>}/>
+                <Route exact path="/about"  element={<AboutUs/>} />
+                <Route exact path="/contact"  element={<ContactUs/>} /> 
+                <Route exact path="/attractions" element={<Attractions/>}/>
+                <Route exact path="/stores" element={<Stores/>} />
+                <Route exact path="/shows" element={<Shows/>} />
+                <Route exact path="/book" element={<BookTickets/>} />
+                <Route exact path="/orders" element={<MyOrders/>} />
+                <Route exact path="/profile" element={<Profile/>} />
+            </Routes>
           </div>
         }
 
         {
-          localStorage.getItem("Login")==="true" && admin &&
+          (sessionStorage.getItem("Login")==="true" && admin) &&
           <div>
-          <Navbar admin={admin}/>
-          <div> 
-          <Routes>
-              <Route path="/emplogin" element={<Navigate to ="/admin" />}/>
-              <Route exact path="/admin" element={<AdminProfile/>} />
-          </Routes>
-        </div>
+            <Navbar admin={admin}/>
+            
+            {
+              console.log("login here3!")
+            }
+            <Routes>
+                <Route path="/emplogin" element={<Navigate to ="/admin" />}/>
+                <Route exact path="/admin" element={<AdminProfile/>} />
+            </Routes>
           </div>
         }
        
-       
-      {/* </header> */}
-    </div>
-    </BrowserRouter>
-    </AppContext.Provider>
+          {
+            console.log("login here4!")
+          }
+  </div>
+  </BrowserRouter>
+  </AppContext.Provider>
   );
 } 
 

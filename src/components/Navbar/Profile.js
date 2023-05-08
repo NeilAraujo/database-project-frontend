@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate} from 'react-router-dom'
 import AppContext from '../../AppContext';
+import axios from 'axios';
 
 const Profile = () => {
     const [profile,setProfile] = useState();
@@ -9,8 +10,8 @@ const Profile = () => {
     const navigate = useNavigate();
 
     useEffect(()=>{
-        fetch('http://localhost:8080/account/profile',{method:'GET',credentials:'include'})
-        .then(response=>response.json())
+        axios.get('http://localhost:8080/account/profile')
+        .then(response=>response.data)
         .then(data=> {
             setProfile(data.data) 
             switch(data.data.vtype){
@@ -28,12 +29,12 @@ const Profile = () => {
     },[])
 
     const handlelogout = () =>{
-        fetch('http://localhost:8080/account/logout',{method:'GET',credentials:'include'})
-        .then(response=>response.json())
+        axios.get('http://localhost:8080/account/logout')
+        .then(response=>response.data)
         .then(data=> {
             if(data.success === true){
                 myContext.setLogin(false)
-                localStorage.setItem("Login",false)
+                sessionStorage.setItem("Login",false)
                 navigate("/")
             }
         })
