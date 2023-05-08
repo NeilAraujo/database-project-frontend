@@ -34,7 +34,8 @@ function TapGroup() {
         <div className='tabGroupBox'>
           <div style = {{display: 'flex'}}>
             {titles.map(title => (
-              <button
+              <button 
+                className='tab'
                 key={title}
                 onClick={() => setActiveTab(title)}
               >

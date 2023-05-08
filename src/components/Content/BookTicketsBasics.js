@@ -32,6 +32,7 @@ export class BookDisplay extends React.Component {
             online: 1, 
             isPaid: 0, 
             price: 100, 
+            amount: 100, //price is the original price of ticket, amount is the price after discount
             discount: 5, 
             ticketType: 2, 
             birthDate: null, 
@@ -178,7 +179,7 @@ export class BookDisplay extends React.Component {
 
     addTicket() {
         this.setState({
-            price: this.state.price * (1 - this.state.discount * 0.01)
+            amount: this.state.price * (1 - this.state.discount * 0.01)
         }, () => {
             axios.post(`http://localhost:8080/ticket/add?tktOnline=1&tktVisitDate=${this.state.visitDateStr}&tktPrice=${this.state.price}&tktDiscount=${this.state.discount}&tktIspaid=0&tktTypeId=${this.state.ticketType}`, headers)
             .then(response => response.data)
@@ -187,7 +188,7 @@ export class BookDisplay extends React.Component {
                     console.log("ticket id: " + this.state.ticketId); 
                     const date = new Date(); 
                     const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate()
-                    axios.post(`http://localhost:8080/order/createorder?oDate=${str}&oQuantity=1&oAmount=${this.state.price}&vId=${this.state.visitorId}&tktId=${this.state.ticketId}`, headers)
+                    axios.post(`http://localhost:8080/order/createorder?oDate=${str}&oQuantity=1&oAmount=${this.state.amount}&vId=${this.state.visitorId}&tktId=${this.state.ticketId}`, headers)
                     .then(response => response.data)
                     .then(data => {
                         this.setState({ orderId: data.data }, () => {
@@ -205,7 +206,7 @@ export class BookDisplay extends React.Component {
             // console.log("try to add card"); 
             const date = new Date(); 
             const str = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
-            axios.post(`http://localhost:8080/payment/addcd?payTime=${str}&payAmount=${this.state.price}&payMethod=${'CD'}&cdName=${this.state.cardName}&cdNum=${this.state.cardNumber}&cdExDate=${this.state.expireDateStr}&cdCvv=${this.state.cvv}&cdCredit=${this.state.credit}`, headers)
+            axios.post(`http://localhost:8080/payment/addcd?payTime=${str}&payAmount=${this.state.amount}&payMethod=${'CD'}&cdName=${this.state.cardName}&cdNum=${this.state.cardNumber}&cdExDate=${this.state.expireDateStr}&cdCvv=${this.state.cvv}&cdCredit=${this.state.credit}`, headers)
                 .then(response => response.data)
                 .then(data => {
                     console.log("add payment successfully"); 
@@ -349,7 +350,7 @@ render() {
                         <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Price: ${this.state.price}</label>
                         <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Type: {ticketTypes[this.state.ticketType]}</label>
                         <label style = {{marginLeft: 30, marginTop: 10}}>Ticket Discount: {this.state.discount}%</label>
-                        <label style = {{marginLeft: 30, marginTop: 10}}>Total Amount: ${this.state.price}</label> 
+                        <label style = {{marginLeft: 30, marginTop: 10}}>Total Amount: ${this.state.amount}</label> 
                     </div>
                     <Form labelCol={{
                             span: 9,

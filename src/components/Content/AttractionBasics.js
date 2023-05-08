@@ -60,7 +60,8 @@ function TabGroup({typeData, attraction, location}) {
       <div className='tabGroupBox'>
         <div style={{displya: 'flex'}}>
           {typeData.map((type, index) => (
-            <button
+            <button 
+              className='tab'
               key={index}
               onClick={() => setActiveType(type.atttype_id)} 
               style = {{fontSize: 22, fontStyle: 'bold', color: '#253A56'}}
