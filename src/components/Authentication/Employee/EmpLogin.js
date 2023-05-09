@@ -56,7 +56,7 @@ const EmpLogin = () => {
             <img src={require('../../../logo.png')} style={{width:79,height:76,margin:10}}/>
             <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'bold',marginBottom:20,marginTop:10}}>Employee Login</div>
 
-            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:70,marginBottom:10}}>Email</div>
+            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:'9%',marginBottom:10}}>Email</div>
             <input
                 style={{width:'80%',height:30,marginBottom:20,borderRadius:6}}
                 value={email} // ...force the input's value to match the state variable...
@@ -64,7 +64,7 @@ const EmpLogin = () => {
                 placeholder='Enter Email'
                 />
 
-            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:70,marginBottom:10}}>Password</div>
+            <div style={{fontSize:20,color:'black',fontFamily:'sans-serif',fontWeight:'initial',alignSelf:'flex-start',marginLeft:'9%',marginBottom:10}}>Password</div>
             <input
                 style={{width:'80%',height:30,marginBottom:20,borderRadius:6}}
                 value={password} // ...force the input's value to match the state variable...
