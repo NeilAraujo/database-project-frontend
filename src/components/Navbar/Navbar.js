@@ -14,15 +14,15 @@ const Navbar = ({admin}) => {
                 !admin 
                 &&
                 <ul style={{display:'flex',listStyle:'none'}}>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><Link to="/" style={{color: 'white',textDecoration:'none'}}>Home</Link></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/about" style={{color: 'white',textDecoration:'none'}}>About Us</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/contact" style={{color: 'white',textDecoration:'none'}}>Contact Us</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/attractions" style={{color: 'white',textDecoration:'none'}}>Attractions</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/stores" style={{color: 'white',textDecoration:'none'}}>Stores</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/shows" style={{color: 'white',textDecoration:'none'}}>Shows</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/book" style={{color: 'white',textDecoration:'none'}}>Book Tickets</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/orders" style={{color: 'white',textDecoration:'none'}}>Orders</NavLink></li>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/profile" style={{color: 'white',textDecoration:'none'}}>Profile</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><Link to="/" style={{color: 'white',textDecoration:'none'}}>Home</Link></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/about" style={{color: 'white',textDecoration:'none'}}>About Us</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/contact" style={{color: 'white',textDecoration:'none'}}>Contact Us</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/attractions" style={{color: 'white',textDecoration:'none'}}>Attractions</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/stores" style={{color: 'white',textDecoration:'none'}}>Stores</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/shows" style={{color: 'white',textDecoration:'none'}}>Shows</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/book" style={{color: 'white',textDecoration:'none'}}>Book Tickets</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/orders" style={{color: 'white',textDecoration:'none'}}>Orders</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontSize:'130%', marginRight:25, marginTop: 20}}><NavLink to="/profile" style={{color: 'white',textDecoration:'none'}}>Profile</NavLink></li>
                 </ul>
             }
 
@@ -30,7 +30,7 @@ const Navbar = ({admin}) => {
                 admin 
                 &&
                 <ul style={{display:'flex',listStyle:'none'}}>
-                    <li style={{color: 'white',textDecoration:'none', fontSize:18, marginRight:15}}><NavLink to="/admin" style={{color: 'white',textDecoration:'none'}}>Admin</NavLink></li>
+                    <li style={{color: 'white',textDecoration:'none', fontStyle: 'bold', fontSize: '150%', marginTop:15}}><NavLink to="/admin" style={{color: 'white',textDecoration:'none'}}>Welcome, Admin!</NavLink></li>
                 </ul>
             }
 
